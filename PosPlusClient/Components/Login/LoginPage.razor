@@ -1,0 +1,11 @@
+﻿@page "/Login"
+@using Microsoft.AspNetCore.Authorization
+@layout LoginLayout
+
+@attribute [AllowAnonymous]
+<LoginDialog Content="@(new User())"/>
+
+@code {
+    
+
+}

@@ -1,0 +1,207 @@
+﻿@page "/Users"
+@using PosPlusClient.Helpers
+@inject IServiceManager ServiceManager
+@inject IDialogService DialogService
+@inject IToastService ToastService
+
+<h1>Administración - Usuarios</h1>
+<FluentDataGrid ref="@grid" Items="Users" TGridItem="User" RowSize="DataGridRowSize.Large">
+    <TemplateColumn Title="Avatar" Width="96px" Style="align-content: center">
+        <FluentPersona Image="@context.Photo"
+                       ImageSize="50px"
+                       Initials="@context.Name.GetInitials()"
+                       Style="background: transparent">
+        </FluentPersona>
+    </TemplateColumn>
+    <PropertyColumn Property="@(p => p.Name)" Sortable="true" Title="Nombre" Align="Align.Center"/>
+    <PropertyColumn Property="@(p => p.Username)" Sortable="true" Title="Usuario" Align="Align.Center"/>
+    <TemplateColumn Title="Disabled" Sortable="true" Width="128px" Style="text-align: center" Align="Align.Center">
+        <FluentCheckbox Value="@context.Disabled" ReadOnly="true"/>
+    </TemplateColumn>
+    <TemplateColumn Title="Actions" Align="Align.Center">
+        <FluentButton aria-label="Edit item" IconEnd="@(new Regular.Size24.Edit())"
+                      OnClick="@(() => OpenDialogAsync(context, "Editar"))"/>
+        <FluentButton aria-label="UserDialog item" IconEnd="@(new Regular.Size24.Delete())"
+                      OnClick="() => ShowDeleteConfirmationAsync(context)"/>
+        <FluentButton aria-label="Permissions" IconEnd="@(new Regular.Size24.Shield())"
+                      OnClick="() => OpenPermissionsDialogAsync(context)"/>
+    </TemplateColumn>
+</FluentDataGrid>
+
+<FluentButton
+    Style="position: fixed; bottom: 65px;right: 25px; border-radius: 50%; width: 56px; height: 56px; box-shadow: #929292 2px 2px 5px"
+    Appearance="Appearance.Accent"
+    IconEnd="@(new Regular.Size32.Add())"
+    Id="floating-plus-btn"
+    OnClick="@(() => OpenDialogAsync(new User(), "Crear"))"
+/>
+
+<FluentTooltip Anchor="floating-plus-btn" Position="TooltipPosition.Left">
+    <strong>Adicionar</strong><br/>Usuario
+</FluentTooltip>
+
+@code {
+    private IQueryable<User> Users { get; set; }
+    private FluentDataGrid<User>? grid;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+        await base.OnInitializedAsync();
+    }
+
+    private async Task LoadData()
+    {
+        grid?.SetLoadingState(true);
+        Users = (await ServiceManager.User.GetAll()).AsQueryable();
+        grid?.SetLoadingState(false);
+    }
+
+    private async Task ShowDeleteConfirmationAsync(User user)
+    {
+        var dialog = await DialogService.ShowConfirmationAsync(
+            $"Está seguro de borrar el usuario <strong>{user.Name}</strong>? <br/><br/> La operación es Irreversible.",
+            "Si, deseo continuar",
+            "No", "Eliminar Usuario");
+
+        if (!(await dialog.Result).Cancelled)
+        {
+            var deleted = await ServiceManager.User.Delete(user);
+
+            if (deleted)
+            {
+                LoadData();
+                ToastService.ShowCommunicationToast(new ToastParameters<CommunicationToastContent>()
+                {
+                    Intent = ToastIntent.Success,
+                    Title = "Exito",
+                    Timeout = 5000,
+                    Content = new CommunicationToastContent()
+                    {
+                        Subtitle = $"El usuario: {user.Name}",
+                        Details = "Fue eliminado exitosamente.",
+                    },
+                });
+            }
+            else
+            {
+                ToastService.ShowCommunicationToast(new ToastParameters<CommunicationToastContent>()
+                {
+                    Intent = ToastIntent.Error,
+                    Title = "Error",
+                    Timeout = 5000,
+                    Content = new CommunicationToastContent()
+                    {
+                        Subtitle = $"El usuario {user.Name}",
+                        Details = "No pudo ser eliminado.",
+                    },
+                });
+            }
+        }
+    }
+
+    private async Task OpenDialogAsync(User user, string action)
+    {
+        DialogParameters parameters = new()
+        {
+            Title = $"{action} Usuario",
+            PrimaryAction = action,
+            SecondaryAction = "Cancelar",
+            Width = "500px",
+            TrapFocus = true,
+            Modal = true,
+            PreventScroll = true
+        };
+
+        var dialog = await DialogService.ShowDialogAsync<UserDialog>(user, parameters);
+        var result = await dialog.Result;
+
+        if (result is { Cancelled: false, Data: not null })
+        {
+            var succes = action == "Crear" ? await ServiceManager.User.Create(user) : await ServiceManager.User.Edit(user);
+
+            if (succes)
+            {
+                LoadData();
+                ToastService.ShowCommunicationToast(new ToastParameters<CommunicationToastContent>()
+                {
+                    Intent = ToastIntent.Success,
+                    Title = "Exito",
+                    Timeout = 5000,
+                    Content = new CommunicationToastContent()
+                    {
+                        Subtitle = $"El usuario: {user.Name}",
+                        Details = $"Fue {(action == "Crear" ? "creado" : "editado")} exitosamente.",
+                    },
+                });
+            }
+            else
+            {
+                ToastService.ShowCommunicationToast(new ToastParameters<CommunicationToastContent>()
+                {
+                    Intent = ToastIntent.Error,
+                    Title = "Error",
+                    Timeout = 5000,
+                    Content = new CommunicationToastContent()
+                    {
+                        Subtitle = $"El usuario {user.Name}",
+                        Details = $"No pudo ser {(action == "Crear" ? "creado" : "editado")}.",
+                    },
+                });
+            }
+        }
+    }
+
+    private async Task OpenPermissionsDialogAsync(User user)
+    {
+        DialogParameters parameters = new()
+        {
+            Title = $"Permisos del usuario: {user.Name}",
+            PrimaryAction = "Aceptar",
+            SecondaryAction = "Cancelar",
+            Width = "700px",
+            TrapFocus = true,
+            Modal = true,
+            PreventScroll = true
+        };
+
+        var permissions = await ServiceManager.User.GetUserPermissionsAsync(user);
+        var dialog = await DialogService.ShowDialogAsync<UserPermissionsDialog>(permissions.AsQueryable(), parameters);
+        var result = await dialog.Result;
+
+        if (result is { Cancelled: false, Data: not null })
+        {
+            var succes = await ServiceManager.User.UpdateUserPermissionsAsync(user, result.Data as IEnumerable<UserPermission>);
+
+            if (succes)
+            {
+                ToastService.ShowCommunicationToast(new ToastParameters<CommunicationToastContent>()
+                {
+                    Intent = ToastIntent.Success,
+                    Title = "Exito",
+                    Timeout = 5000,
+                    Content = new CommunicationToastContent()
+                    {
+                        Subtitle = $"Permisos actualizados exitosamente.",
+                        Details = $"Al usuario: {user.Name}",
+                    },
+                });
+            }
+            else
+            {
+                ToastService.ShowCommunicationToast(new ToastParameters<CommunicationToastContent>()
+                {
+                    Intent = ToastIntent.Error,
+                    Title = "Error",
+                    Timeout = 5000,
+                    Content = new CommunicationToastContent()
+                    {
+                        Subtitle = $"No fueron Actualizados los permisos.",
+                        Details = $"Al usuario {user.Name}",
+                    },
+                });
+            }
+        }
+    }
+
+}

@@ -1,0 +1,765 @@
+{
+	"tables": {
+		"4bc2a851-07be-4574-8a7e-8bc1a6799d2a": {
+			"lines": [],
+			"embeddable": false,
+			"generate": true,
+			"generateCustomCode": true,
+			"id": "4bc2a851-07be-4574-8a7e-8bc1a6799d2a",
+			"name": "Logs",
+			"desc": "",
+			"cols": [
+				{
+					"id": "269c7cfd-d5bd-4eb7-bd93-33bfadf0671d",
+					"name": "id",
+					"datatype": "INTEGER",
+					"param": "",
+					"pk": true,
+					"nn": true,
+					"comment": "",
+					"data": "",
+					"estimatedSize": "",
+					"defaultvalue": "",
+					"fk": false,
+					"after": "",
+					"json": false,
+					"sqlite": {
+						"autoincrement": true
+					}
+				},
+				{
+					"id": "af6698f0-80d7-4394-a533-a4d3e6c34874",
+					"name": "timestamp",
+					"datatype": "TEXT",
+					"param": "",
+					"pk": false,
+					"nn": false,
+					"comment": "",
+					"data": "",
+					"estimatedSize": "",
+					"defaultvalue": "",
+					"fk": false,
+					"after": "",
+					"json": true,
+					"sqlite": {
+						"autoincrement": false
+					}
+				},
+				{
+					"id": "315c1d82-e297-48ab-892d-a2b14a3fa80d",
+					"name": "level",
+					"datatype": "VARCHAR",
+					"param": "",
+					"pk": false,
+					"nn": false,
+					"comment": "",
+					"data": "",
+					"estimatedSize": "",
+					"defaultvalue": "",
+					"fk": false,
+					"after": "",
+					"json": false,
+					"sqlite": {
+						"autoincrement": false
+					}
+				},
+				{
+					"id": "fc81a155-f679-44a4-8fb4-fcd7ec6a2638",
+					"name": "exception",
+					"datatype": "TEXT",
+					"param": "",
+					"pk": false,
+					"nn": false,
+					"comment": "",
+					"data": "",
+					"estimatedSize": "",
+					"defaultvalue": "",
+					"fk": false,
+					"after": "",
+					"json": true,
+					"sqlite": {
+						"autoincrement": false
+					}
+				},
+				{
+					"id": "9b90c4e8-182c-495f-9aab-b65217f4601e",
+					"name": "renderedmessage",
+					"datatype": "TEXT",
+					"param": "",
+					"pk": false,
+					"nn": false,
+					"comment": "",
+					"data": "",
+					"estimatedSize": "",
+					"defaultvalue": "",
+					"fk": false,
+					"after": "",
+					"json": true,
+					"sqlite": {
+						"autoincrement": false
+					}
+				},
+				{
+					"id": "479ed4d4-00ec-4c09-bccb-71c83f7f4e86",
+					"name": "properties",
+					"datatype": "TEXT",
+					"param": "",
+					"pk": false,
+					"nn": false,
+					"comment": "",
+					"data": "",
+					"estimatedSize": "",
+					"defaultvalue": "",
+					"fk": false,
+					"after": "",
+					"json": true,
+					"sqlite": {
+						"autoincrement": false
+					}
+				}
+			],
+			"relations": [],
+			"keys": [
+				{
+					"id": "c73884f3-b912-4420-9dc6-3a7242181a14",
+					"isPk": true,
+					"name": "Primary key",
+					"cols": [
+						{
+							"id": "a8ffc262-cdb9-47e4-aabf-faf87b704604",
+							"colid": "269c7cfd-d5bd-4eb7-bd93-33bfadf0671d"
+						}
+					]
+				}
+			],
+			"indexes": [],
+			"afterScript": " ",
+			"estimatedSize": "",
+			"sqlite": {
+				"withoutrowid": false,
+				"strict": false
+			},
+			"visible": true,
+			"customCode": ""
+		}
+	},
+	"relations": {},
+	"notes": {},
+	"lines": {},
+	"model": {
+		"connectionId": "b25c6eaa-3be5-4b5a-bd48-e8d8947dee6c",
+		"connectionVersion": "[{\"schema_version\":2}]",
+		"activeDiagram": "570be56e-8e34-450e-93d9-d18d3fb54fef",
+		"caseConvention": "under",
+		"color": "transparent",
+		"def_coltopk": true,
+		"desc": "",
+		"id": "d6bea99c-f07f-4323-9d96-77f450a1bcef",
+		"isDirty": true,
+		"name": "SQLite",
+		"parentTableInFkCols": true,
+		"path": "",
+		"replaceSpace": "_",
+		"sideSelections": true,
+		"storedin": {
+			"major": 8,
+			"minor": 5,
+			"extra": 1
+		},
+		"laststoredin": {
+			"major": 8,
+			"minor": 5,
+			"extra": 1
+		},
+		"type": "SQLITE",
+		"version": 1,
+		"lastSaved": "",
+		"sqlSettings": {
+			"wrapLines": true,
+			"wrapOffset": 80,
+			"indent": true,
+			"indentationString": "spaces",
+			"indentationSize": 2,
+			"limitItemsOnLine": true,
+			"maxListItemsOnLine": 3,
+			"statementDelimiter": ";",
+			"routineDelimiter": ";",
+			"keywordCase": "upper",
+			"identiferCase": "original"
+		},
+		"writeFileParam": false,
+		"authorName": "",
+		"companyDetails": "",
+		"companyUrl": ""
+	},
+	"otherObjects": {},
+	"diagrams": {
+		"570be56e-8e34-450e-93d9-d18d3fb54fef": {
+			"id": "570be56e-8e34-450e-93d9-d18d3fb54fef",
+			"lineColor": "transparent",
+			"description": "",
+			"diagramItems": {
+				"4bc2a851-07be-4574-8a7e-8bc1a6799d2a": {
+					"x": 175,
+					"y": 157,
+					"gHeight": 135,
+					"gWidth": 228,
+					"background": "#03a9f4",
+					"color": "#ffffff",
+					"referencedItemId": "4bc2a851-07be-4574-8a7e-8bc1a6799d2a",
+					"resized": false,
+					"autoExpand": true,
+					"backgroundOpacity": "10"
+				}
+			},
+			"isOpen": true,
+			"main": true,
+			"name": "Main Diagram",
+			"keysgraphics": true,
+			"linegraphics": "detailed",
+			"zoom": 1,
+			"background": "transparent",
+			"scroll": {
+				"x": 0,
+				"y": 0
+			},
+			"type": "erd",
+			"showEstimatedSize": false,
+			"showSchemaContainer": false,
+			"showEmbeddedInParents": true,
+			"showCardinalityCaptions": false,
+			"showRelationshipNames": false,
+			"showLineCaptions": true,
+			"showColumns": true,
+			"showColumnDataTypes": true,
+			"showSampleData": false,
+			"showTableIndexes": false,
+			"showTableDescriptions": false,
+			"showRelations": true,
+			"showHorizontal": false,
+			"showDescriptions": true,
+			"showIndicators": false,
+			"showProgress": false,
+			"showIndicatorCaptions": false,
+			"backgroundImage": "na",
+			"descriptionsColor": "transparent",
+			"boxSize": "0",
+			"boxSpacing": "2",
+			"boxAlign": "center",
+			"lineWidth": "2",
+			"embeddedSpacing": "2",
+			"showLabels": true,
+			"showMainIcon": true,
+			"showCustomizations": false
+		}
+	},
+	"diagramsOrder": [],
+	"order": [
+		"4bc2a851-07be-4574-8a7e-8bc1a6799d2a"
+	],
+	"collapsedTreeItems": [],
+	"reverseStats": {
+		"diffReport": {
+			"statistics": [
+				{
+					"caption": "Tables",
+					"count": {
+						"added": {
+							"count": 0,
+							"idNames": []
+						},
+						"removed": {
+							"count": 0,
+							"idNames": []
+						},
+						"modified": {
+							"count": 0,
+							"idNames": []
+						},
+						"total": 1
+					}
+				},
+				{
+					"caption": "Columns",
+					"count": {
+						"added": {
+							"count": 0,
+							"idNames": []
+						},
+						"removed": {
+							"count": 0,
+							"idNames": []
+						},
+						"modified": {
+							"count": 0,
+							"idNames": []
+						},
+						"total": 6
+					}
+				},
+				{
+					"caption": "Indexes",
+					"count": {
+						"added": {
+							"count": 0,
+							"idNames": []
+						},
+						"removed": {
+							"count": 0,
+							"idNames": []
+						},
+						"modified": {
+							"count": 0,
+							"idNames": []
+						},
+						"total": 0
+					}
+				},
+				{
+					"caption": "Relations",
+					"count": {
+						"added": {
+							"count": 0,
+							"idNames": []
+						},
+						"removed": {
+							"count": 0,
+							"idNames": []
+						},
+						"modified": {
+							"count": 0,
+							"idNames": []
+						},
+						"total": 0
+					}
+				},
+				{
+					"caption": "Views",
+					"count": {
+						"added": {
+							"count": 0,
+							"idNames": []
+						},
+						"removed": {
+							"count": 0,
+							"idNames": []
+						},
+						"modified": {
+							"count": 0,
+							"idNames": []
+						},
+						"total": 0
+					}
+				},
+				{
+					"caption": "Triggers",
+					"count": {
+						"added": {
+							"count": 0,
+							"idNames": []
+						},
+						"removed": {
+							"count": 0,
+							"idNames": []
+						},
+						"modified": {
+							"count": 0,
+							"idNames": []
+						},
+						"total": 0
+					}
+				}
+			]
+		},
+		"currentModel": {
+			"model": {
+				"connectionId": "b25c6eaa-3be5-4b5a-bd48-e8d8947dee6c",
+				"connectionVersion": "[{\"schema_version\":2}]",
+				"activeDiagram": "570be56e-8e34-450e-93d9-d18d3fb54fef",
+				"caseConvention": "under",
+				"color": "transparent",
+				"def_coltopk": true,
+				"desc": "",
+				"id": "d6bea99c-f07f-4323-9d96-77f450a1bcef",
+				"isDirty": true,
+				"name": "SQLite",
+				"parentTableInFkCols": true,
+				"path": "",
+				"replaceSpace": "_",
+				"sideSelections": true,
+				"storedin": {
+					"major": 8,
+					"minor": 5,
+					"extra": 1
+				},
+				"laststoredin": {
+					"major": 8,
+					"minor": 5,
+					"extra": 1
+				},
+				"type": "SQLITE",
+				"version": 1,
+				"filePath": "",
+				"lastSaved": "",
+				"sqlSettings": {
+					"wrapLines": true,
+					"wrapOffset": 80,
+					"indent": true,
+					"indentationString": "spaces",
+					"indentationSize": 2,
+					"limitItemsOnLine": true,
+					"maxListItemsOnLine": 3,
+					"statementDelimiter": ";",
+					"routineDelimiter": ";",
+					"keywordCase": "upper",
+					"identiferCase": "original"
+				},
+				"writeFileParam": false,
+				"authorName": "",
+				"companyDetails": "",
+				"companyUrl": ""
+			},
+			"tables": {
+				"4bc2a851-07be-4574-8a7e-8bc1a6799d2a": {
+					"lines": [],
+					"embeddable": false,
+					"generate": true,
+					"generateCustomCode": true,
+					"id": "4bc2a851-07be-4574-8a7e-8bc1a6799d2a",
+					"name": "Logs",
+					"desc": "",
+					"cols": [
+						{
+							"id": "269c7cfd-d5bd-4eb7-bd93-33bfadf0671d",
+							"name": "id",
+							"datatype": "INTEGER",
+							"param": "",
+							"pk": true,
+							"nn": true,
+							"comment": "",
+							"data": "",
+							"estimatedSize": "",
+							"defaultvalue": "",
+							"fk": false,
+							"after": "",
+							"json": false,
+							"sqlite": {
+								"autoincrement": true
+							}
+						},
+						{
+							"id": "af6698f0-80d7-4394-a533-a4d3e6c34874",
+							"name": "timestamp",
+							"datatype": "TEXT",
+							"param": "",
+							"pk": false,
+							"nn": false,
+							"comment": "",
+							"data": "",
+							"estimatedSize": "",
+							"defaultvalue": "",
+							"fk": false,
+							"after": "",
+							"json": true,
+							"sqlite": {
+								"autoincrement": false
+							}
+						},
+						{
+							"id": "315c1d82-e297-48ab-892d-a2b14a3fa80d",
+							"name": "level",
+							"datatype": "VARCHAR",
+							"param": "",
+							"pk": false,
+							"nn": false,
+							"comment": "",
+							"data": "",
+							"estimatedSize": "",
+							"defaultvalue": "",
+							"fk": false,
+							"after": "",
+							"json": false,
+							"sqlite": {
+								"autoincrement": false
+							}
+						},
+						{
+							"id": "fc81a155-f679-44a4-8fb4-fcd7ec6a2638",
+							"name": "exception",
+							"datatype": "TEXT",
+							"param": "",
+							"pk": false,
+							"nn": false,
+							"comment": "",
+							"data": "",
+							"estimatedSize": "",
+							"defaultvalue": "",
+							"fk": false,
+							"after": "",
+							"json": true,
+							"sqlite": {
+								"autoincrement": false
+							}
+						},
+						{
+							"id": "9b90c4e8-182c-495f-9aab-b65217f4601e",
+							"name": "renderedmessage",
+							"datatype": "TEXT",
+							"param": "",
+							"pk": false,
+							"nn": false,
+							"comment": "",
+							"data": "",
+							"estimatedSize": "",
+							"defaultvalue": "",
+							"fk": false,
+							"after": "",
+							"json": true,
+							"sqlite": {
+								"autoincrement": false
+							}
+						},
+						{
+							"id": "479ed4d4-00ec-4c09-bccb-71c83f7f4e86",
+							"name": "properties",
+							"datatype": "TEXT",
+							"param": "",
+							"pk": false,
+							"nn": false,
+							"comment": "",
+							"data": "",
+							"estimatedSize": "",
+							"defaultvalue": "",
+							"fk": false,
+							"after": "",
+							"json": true,
+							"sqlite": {
+								"autoincrement": false
+							}
+						}
+					],
+					"relations": [],
+					"keys": [
+						{
+							"id": "c73884f3-b912-4420-9dc6-3a7242181a14",
+							"isPk": true,
+							"name": "Primary key",
+							"cols": [
+								{
+									"id": "a8ffc262-cdb9-47e4-aabf-faf87b704604",
+									"colid": "269c7cfd-d5bd-4eb7-bd93-33bfadf0671d"
+								}
+							]
+						}
+					],
+					"indexes": [],
+					"afterScript": " ",
+					"estimatedSize": "",
+					"sqlite": {
+						"withoutrowid": false,
+						"strict": false
+					},
+					"visible": true,
+					"customCode": ""
+				}
+			},
+			"relations": {},
+			"otherObjects": {}
+		},
+		"updatedModel": {
+			"model": {
+				"connectionId": "b25c6eaa-3be5-4b5a-bd48-e8d8947dee6c",
+				"connectionVersion": "[{\"schema_version\":2}]",
+				"activeDiagram": "570be56e-8e34-450e-93d9-d18d3fb54fef",
+				"caseConvention": "under",
+				"color": "transparent",
+				"def_coltopk": true,
+				"desc": "",
+				"id": "d6bea99c-f07f-4323-9d96-77f450a1bcef",
+				"isDirty": true,
+				"name": "SQLite",
+				"parentTableInFkCols": true,
+				"path": "",
+				"replaceSpace": "_",
+				"sideSelections": true,
+				"storedin": {
+					"major": 8,
+					"minor": 5,
+					"extra": 1
+				},
+				"laststoredin": {
+					"major": 8,
+					"minor": 5,
+					"extra": 1
+				},
+				"type": "SQLITE",
+				"version": 1,
+				"filePath": "",
+				"lastSaved": "",
+				"sqlSettings": {
+					"wrapLines": true,
+					"wrapOffset": 80,
+					"indent": true,
+					"indentationString": "spaces",
+					"indentationSize": 2,
+					"limitItemsOnLine": true,
+					"maxListItemsOnLine": 3,
+					"statementDelimiter": ";",
+					"routineDelimiter": ";",
+					"keywordCase": "upper",
+					"identiferCase": "original"
+				},
+				"writeFileParam": false,
+				"authorName": "",
+				"companyDetails": "",
+				"companyUrl": ""
+			},
+			"tables": {
+				"4bc2a851-07be-4574-8a7e-8bc1a6799d2a": {
+					"lines": [],
+					"embeddable": false,
+					"generate": true,
+					"generateCustomCode": true,
+					"id": "4bc2a851-07be-4574-8a7e-8bc1a6799d2a",
+					"name": "Logs",
+					"desc": "",
+					"cols": [
+						{
+							"id": "269c7cfd-d5bd-4eb7-bd93-33bfadf0671d",
+							"name": "id",
+							"datatype": "INTEGER",
+							"param": "",
+							"pk": true,
+							"nn": true,
+							"comment": "",
+							"data": "",
+							"estimatedSize": "",
+							"defaultvalue": "",
+							"fk": false,
+							"after": "",
+							"json": false,
+							"sqlite": {
+								"autoincrement": true
+							}
+						},
+						{
+							"id": "af6698f0-80d7-4394-a533-a4d3e6c34874",
+							"name": "timestamp",
+							"datatype": "TEXT",
+							"param": "",
+							"pk": false,
+							"nn": false,
+							"comment": "",
+							"data": "",
+							"estimatedSize": "",
+							"defaultvalue": "",
+							"fk": false,
+							"after": "",
+							"json": true,
+							"sqlite": {
+								"autoincrement": false
+							}
+						},
+						{
+							"id": "315c1d82-e297-48ab-892d-a2b14a3fa80d",
+							"name": "level",
+							"datatype": "VARCHAR",
+							"param": "",
+							"pk": false,
+							"nn": false,
+							"comment": "",
+							"data": "",
+							"estimatedSize": "",
+							"defaultvalue": "",
+							"fk": false,
+							"after": "",
+							"json": false,
+							"sqlite": {
+								"autoincrement": false
+							}
+						},
+						{
+							"id": "fc81a155-f679-44a4-8fb4-fcd7ec6a2638",
+							"name": "exception",
+							"datatype": "TEXT",
+							"param": "",
+							"pk": false,
+							"nn": false,
+							"comment": "",
+							"data": "",
+							"estimatedSize": "",
+							"defaultvalue": "",
+							"fk": false,
+							"after": "",
+							"json": true,
+							"sqlite": {
+								"autoincrement": false
+							}
+						},
+						{
+							"id": "9b90c4e8-182c-495f-9aab-b65217f4601e",
+							"name": "renderedmessage",
+							"datatype": "TEXT",
+							"param": "",
+							"pk": false,
+							"nn": false,
+							"comment": "",
+							"data": "",
+							"estimatedSize": "",
+							"defaultvalue": "",
+							"fk": false,
+							"after": "",
+							"json": true,
+							"sqlite": {
+								"autoincrement": false
+							}
+						},
+						{
+							"id": "479ed4d4-00ec-4c09-bccb-71c83f7f4e86",
+							"name": "properties",
+							"datatype": "TEXT",
+							"param": "",
+							"pk": false,
+							"nn": false,
+							"comment": "",
+							"data": "",
+							"estimatedSize": "",
+							"defaultvalue": "",
+							"fk": false,
+							"after": "",
+							"json": true,
+							"sqlite": {
+								"autoincrement": false
+							}
+						}
+					],
+					"relations": [],
+					"keys": [
+						{
+							"id": "c73884f3-b912-4420-9dc6-3a7242181a14",
+							"isPk": true,
+							"name": "Primary key",
+							"cols": [
+								{
+									"id": "a8ffc262-cdb9-47e4-aabf-faf87b704604",
+									"colid": "269c7cfd-d5bd-4eb7-bd93-33bfadf0671d"
+								}
+							]
+						}
+					],
+					"indexes": [],
+					"afterScript": " ",
+					"estimatedSize": "",
+					"sqlite": {
+						"withoutrowid": false,
+						"strict": false
+					},
+					"visible": true,
+					"customCode": ""
+				}
+			},
+			"relations": {},
+			"otherObjects": {}
+		}
+	}
+}

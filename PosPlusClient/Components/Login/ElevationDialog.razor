@@ -1,0 +1,81 @@
+﻿@implements IDialogContentComponent<string>
+@inject IServiceManager ServiceManager
+
+
+<FluentDialogHeader Visible="false"/>
+<FluentDialogBody>
+    <FluentStack Orientation="Orientation.Vertical" VerticalAlignment="VerticalAlignment.Top"
+                 HorizontalAlignment="HorizontalAlignment.Center" Style="row-gap: 0">
+        <div id="logo-container">
+            <img src="assets/_key_sharedpass.png" style="width: 96px; height: 96px"/>
+        </div>
+        <FluentLabel Alignment="HorizontalAlignment.Center" Weight="FontWeight.Bold" Style="font-size: 2em">Contraseña
+            Compartida
+        </FluentLabel>
+        <FluentStack Orientation="Orientation.Vertical" HorizontalAlignment="HorizontalAlignment.Center"
+                     VerticalGap="20" Style="padding: 20px 0 20px 0">
+            <FluentKeyCode OnKeyDown="@KeyDownHandler">
+                <FluentTextField @bind-Value="Content" TextFieldType="TextFieldType.Password "
+                                 Appearance="FluentInputAppearance.Filled" Placeholder="Contraseña" Required="@true" Immediate="@true">
+                    <FluentIcon Value="@(new Filled.Size16.Password())" Slot="start" Color="Color.Neutral"/>
+                </FluentTextField>
+            </FluentKeyCode>
+            <FluentSpacer/>
+            <FluentButton OnClick="@OnValidate" Appearance="Appearance.Accent">Acceder</FluentButton>
+        </FluentStack>
+    </FluentStack>
+    <FluentOverlay @bind-Visible="@_isloading"
+                   Opacity="0.4"
+                   Alignment="Align.Center"
+                   Justification="JustifyContent.Center">
+        <FluentProgressRing/>
+    </FluentOverlay>
+</FluentDialogBody>
+<FluentDialogFooter Visible="@false"/>
+
+
+@code {
+    [Parameter] public string Content { get; set; } = default!;
+
+    [CascadingParameter] public FluentDialog _fluentDialog { get; set; }
+
+    private bool _isloading = false;
+   
+
+    private async Task KeyDownHandler(FluentKeyCodeEventArgs e)
+    {
+        if (e.KeyCode == 13)
+        {
+            await OnValidate();
+        }
+    }
+
+    private async Task OnValidate()
+    {
+        try
+        {
+            _isloading = true;
+            if (string.IsNullOrEmpty(Content))
+            {
+                await _fluentDialog.CancelAsync();
+                return;
+            }
+
+            var user = await ServiceManager.User.ValidateSharedPassword(Content);
+            if (user != null)
+            {
+                await _fluentDialog.CloseAsync(user);
+            }
+            else
+            {
+                await _fluentDialog.CancelAsync();
+            }
+        }
+        finally
+        {
+            _isloading = false;
+        }
+    }
+
+}
+

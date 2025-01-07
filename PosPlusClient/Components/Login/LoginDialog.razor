@@ -1,0 +1,101 @@
+﻿@using Microsoft.FluentUI.AspNetCore.Components.DesignTokens
+@using PosPlusClient.Services
+@inject SimpleAuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@implements IDialogContentComponent<User>
+@inject IMessageService MessageService
+
+<FluentDialog Id="LoginDialog" aria-label="Simple dialog" @ref="_fluentDialog" Style="--dialog-width:350px;"
+              Modal="true">
+    <FluentDialogHeader Visible="false"/>
+    <FluentStack Orientation="Orientation.Vertical" VerticalAlignment="VerticalAlignment.Top" HorizontalAlignment="HorizontalAlignment.Center" Style="row-gap: 0">
+        <div id="logo-container">
+            <img src="assets/_logo_login.png" style="width: 96px; height: 96px"/>
+        </div>
+        <FluentLabel Alignment="HorizontalAlignment.Center" Weight="FontWeight.Bold" Style="font-size: 2em">Login
+        </FluentLabel>
+        <FluentEditForm Model="Content" OnValidSubmit="@OnValidate" FormName="login_user">
+            <FluentValidationSummary/>
+            <FluentStack Orientation="Orientation.Vertical" HorizontalAlignment="HorizontalAlignment.Center"
+                         VerticalGap="20" Style="padding: 20px 0 20px 0">
+                <FluentTextField @bind-Value="Content.Username" Appearance="FluentInputAppearance.Filled"
+                                 Placeholder="Usuario" Required="@true">
+                    <FluentIcon Value="@(new Filled.Size16.Person())" Slot="start" Color="Color.Neutral"/>
+                </FluentTextField>
+                <FluentTextField @bind-Value="Content.Password" TextFieldType="TextFieldType.Password"
+                                 Appearance="FluentInputAppearance.Filled" Placeholder="Contraseña" Required="@true">
+                    <FluentIcon Value="@(new Filled.Size16.Password())" Slot="start" Color="Color.Neutral"/>
+                </FluentTextField>
+                <FluentSpacer/>
+                <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent">Acceder</FluentButton>
+            </FluentStack>
+        </FluentEditForm>
+        <div style="height: 45px">
+            <FluentMessageBarProvider MaxMessageCount="1" Section="DIALOG_MESSAGES"/>   
+        </div>
+    </FluentStack>
+
+   
+    <FluentOverlay @bind-Visible="@_isloading"
+                   Opacity="0.4"
+                   Alignment="Align.Center"
+                   Justification="JustifyContent.Center">
+        <FluentProgressRing />
+    </FluentOverlay>
+</FluentDialog>
+
+@code {
+    [Parameter] public User Content { get; set; } = default!;
+    private FluentDialog _fluentDialog = default!;
+    private bool _isloading = false;
+
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+    }
+
+    public async Task OnValidate()
+    {
+        try
+        {
+            _isloading = true;
+            var success = await AuthenticationStateProvider.LoginAsync(Content.Username, Content.Password);
+            if (success)
+            {
+                NavigationManager.NavigateTo("/");
+            }
+            else
+            {
+                const string message = $"Acceso Denegado";
+                await MessageService.ShowMessageBarAsync(options =>
+                {
+                    options.Intent = Enum.GetValues<MessageIntent>()[2];
+                    options.Title = message;
+                    options.Timeout = 3000;
+                    options.Section = "DIALOG_MESSAGES";
+                    options.ClearAfterNavigation = true;
+                });
+
+            }
+        }
+        catch (Exception e)
+        {
+            const string message = $"Error del Sistema";
+            await MessageService.ShowMessageBarAsync(options =>
+            {
+                options.Intent = Enum.GetValues<MessageIntent>()[2];
+                options.Title = message;
+                options.Timeout = 3000;
+                options.Section = "DIALOG_MESSAGES";
+                options.ClearAfterNavigation = true;
+            });
+        }
+        finally
+        {
+            _isloading = false;
+        }
+        
+    }
+
+
+}

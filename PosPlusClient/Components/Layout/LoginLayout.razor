@@ -1,0 +1,23 @@
+﻿@inherits LayoutComponentBase
+<FluentToastProvider/>
+<FluentDialogProvider/>
+<FluentTooltipProvider/>
+<FluentMessageBarProvider Section="ON_TOP"/>
+<FluentMenuProvider/>
+
+<div>
+    <FluentLayout Id="LoginLayout">
+        <FluentStack Orientation="Orientation.Horizontal" Width="100%">
+            <FluentBodyContent>
+                @Body
+            </FluentBodyContent>
+        </FluentStack>
+        <FluentFooter Class="footer">
+            <p style="line-height: 1; margin: 0;">PosPlus-@DateTime.Today.Year<br><small>Todos los derechos reservados.</small></p>
+        </FluentFooter>
+    </FluentLayout>   
+</div>
+
+@code {
+
+}

@@ -1,0 +1,50 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using PosPlusClient.Components.Shared
+@using PosPlusClient.Services
+@inherits LayoutComponentBase
+@inject SimpleAuthenticationStateProvider AuthenticationStateProvider
+@inject IDialogService DialogService
+
+<FluentToastProvider/>
+<FluentDialogProvider/>
+<FluentTooltipProvider/>
+<FluentMessageBarProvider/>
+<FluentMenuProvider/>
+
+<AuthorizeView>
+    <Authorized>
+        <FluentLayout>
+            <Header/>
+            <FluentStack Orientation="Orientation.Horizontal" Width="100%">
+                <LeftNavBar/>
+                <FluentBodyContent>
+                    @Body
+                </FluentBodyContent>
+            </FluentStack>
+            <FluentFooter Class="footer">
+                <p style="line-height: 1; margin: 0;">PosPlus-@DateTime.Today.Year<br><small>Todos los derechos
+                    reservados.</small></p>
+            </FluentFooter>
+        </FluentLayout>
+        
+    </Authorized>
+    <NotAuthorized>
+        <RedirectToLogin IsAuthenticated="@context.User.Identity.IsAuthenticated" />  
+    </NotAuthorized>
+</AuthorizeView>
+
+
+
+<div id="blazor-error-ui" data-nosnippet>
+    Ha ocurrido un error inesperado.
+    <a href="." class="reload">Recargar</a>
+    <span class="dismiss">🗙</span>
+</div>
+
+@code {
+   
+
+}
+
+

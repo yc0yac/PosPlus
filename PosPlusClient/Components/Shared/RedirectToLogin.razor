@@ -1,0 +1,20 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@inject NavigationManager NavigationManager
+@attribute [AllowAnonymous]
+
+@code {
+    [Parameter]
+    public bool IsAuthenticated { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!IsAuthenticated)
+        {
+           NavigationManager.NavigateTo("Login");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+}

@@ -1,0 +1,240 @@
+﻿@using Newtonsoft.Json
+@using PosPlusClient.Helpers
+@using JsonSerializer = System.Text.Json.JsonSerializer
+@implements IDialogContentComponent<User>
+
+<FluentDialogHeader ShowDismiss="true">
+    <FluentStack VerticalAlignment="VerticalAlignment.Center">
+        @if (Dialog.Instance.Parameters.PrimaryAction == "Crear")
+        {
+            <FluentIcon Value="@(new Regular.Size24.PersonAdd())"/>
+        }
+        else
+        {
+            <FluentIcon Value="@(new Regular.Size24.PersonEdit())"/>
+        }
+
+        <FluentLabel Typo="Typography.PaneHeader">
+            @Dialog?.Instance.Parameters.Title
+        </FluentLabel>
+    </FluentStack>
+</FluentDialogHeader>
+
+<FluentDialogBody>
+    <FluentEditForm EditContext="@_editContext" FormName="create_user" novalidate>
+        <DataAnnotationsValidator/>
+        <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.Stretch">
+            <FluentStack Orientation="Orientation.Vertical" HorizontalAlignment="HorizontalAlignment.Center">
+                <FluentInputFile Id="my-file-uploader"
+                                 Mode="InputFileMode.SaveToTemporaryFolder"
+                                 Multiple="false"
+                                 MaximumFileCount="1"
+                                 MaximumFileSize="@(10 * 1024 * 1024)"
+                                 Accept="image/*"
+                                 @bind-ProgressPercent="@_progressPercent"
+                                 OnCompleted="@OnCompletedAsync" style="padding: 5px">
+                    <ChildContent>
+                        <div style="display: flex;justify-content: center;">
+                            <FluentPersona Image="@Content.Photo"
+                                           ImageSize="112px"
+                                           TextPosition="TextPosition.Start"
+                                           Initials="@Content.Name.GetInitials()">
+                            </FluentPersona>
+                        </div>
+                        <label for="my-file-uploader">
+                            <FluentIcon Value="@(new Regular.Size24.ArrowUpload())"/>
+                        </label>
+                        <div>
+                            Arrastra una foto para agregarla,
+                            o <label for="my-file-uploader">buscala</label>
+                            en el equipo<span style="color: red;">*</span>.
+                        </div>
+                    </ChildContent>
+                </FluentInputFile>
+                <div style="width: 100%">
+                    <FluentTextField Name="create_name"
+                                     @bind-Value="@Content.Name"
+                                     Label="Nombre"
+                                     Required
+                                     Style="width: 100%"
+                                     Autofocus="@true"
+                                     Appearance="FluentInputAppearance.Filled"/>
+                    <FluentValidationMessage For="@(() => Content.Name)"/>
+                </div>
+                <div style="width: 100%">
+                    <FluentTextField Name="email_password"
+                                     @bind-Value="@Content.Email"
+                                     Label="Correo"
+                                     Required
+                                     TextFieldType="TextFieldType.Email"
+                                     Style="width: 100%"
+                                     Appearance="FluentInputAppearance.Filled"/>
+                    <FluentValidationMessage For="@(() => Content.Email)"/>
+                </div>
+                <div style="width: 100%">
+                    <FluentTextField Name="create_position"
+                                     @bind-Value="@Content.Position"
+                                     Label="Posición"
+                                     Required
+                                     TextFieldType="TextFieldType.Text"
+                                     Style="width: 100%"
+                                     Appearance="FluentInputAppearance.Filled"/>
+                    <FluentValidationMessage For="@(() => Content.Position)"/>
+                </div>
+            </FluentStack>
+            <FluentStack Orientation="Orientation.Vertical">
+                
+                <div style="width: 100%">
+                    <FluentTextField Name="create_username"
+                                     @bind-Value="@Content.Username"
+                                     Label="Usuario"
+                                     Required
+                                     Style="width: 100%"
+                                     Appearance="FluentInputAppearance.Filled"/>
+                    <FluentValidationMessage For="@(() => Content.Username)"/>
+                </div>
+                <div style="width: 100%">
+                    <FluentTextField Name="create_password"
+                                     @bind-Value="@Content.Password"
+                                     Label="Contraseña"
+                                     Required
+                                     TextFieldType="TextFieldType.Password"
+                                     Style="width: 100%"
+                                     Appearance="FluentInputAppearance.Filled"/>
+                    <FluentValidationMessage For="@(() => Content.Password)"/>
+                </div>
+                <FluentStack Orientation="Orientation.Horizontal">
+                    <div style="width: 100%">
+                        <FluentCheckbox Name="disabled"
+                                        @bind-Value="@Content.Disabled"
+                                        Label="Desabilitado">
+                        </FluentCheckbox>
+                    </div>
+                    <div style="width: 100%">
+                        <FluentCheckbox Name="admin"
+                                        @bind-Value="@Content.IsAdmin"
+                                        Label="Administrador">
+                        </FluentCheckbox>
+                    </div>
+                </FluentStack>
+                <div style="width: 100%">
+                    <FluentTextField Name="create_shared_pasword"
+                                     @bind-Value="@Content.SharedPassword"
+                                     Label="Contraseña compartida"
+                                     Required
+                                     TextFieldType="TextFieldType.Password"
+                                     Style="width: 100%"
+                                     Appearance="FluentInputAppearance.Filled"
+                                     Disabled="@(!Content.IsAdmin)"/>
+                    <FluentValidationMessage For="@(() => Content.SharedPassword)"/>
+                </div>
+                <div style="width: 100%">
+                    <FluentNumberField Name="fixed_salary"
+                                       @bind-Value="@_salaryValues.FixedVal"
+                                       Label="Salario Fijo"
+                                       Min="0"
+                                       Style="width: 100%"
+                                       Appearance="FluentInputAppearance.Filled"/>
+                </div>
+                <div style="width: 100%">
+                    <FluentNumberField Name="selfsales"
+                                       @bind-Value="@_salaryValues.OverSelfSales"
+                                       Label="% Ganancia de sus ventas."
+                                       Min="0"
+                                       Max="100"
+                                       Style="width: 100%"
+                                       Appearance="FluentInputAppearance.Filled"/>
+                </div>
+                <div style="width: 100%">
+                    <FluentNumberField Name="allsales"
+                                       @bind-Value="@_salaryValues.OverAllSales"
+                                       Label="% Ganancia de sus ventas."
+                                       Min="0"
+                                       Max="100"
+                                       Style="width: 100%"
+                                       Appearance="FluentInputAppearance.Filled"/>
+                </div>
+            </FluentStack>
+        </FluentStack>
+    </FluentEditForm>
+</FluentDialogBody>
+<FluentDialogFooter>
+    <FluentButton Appearance="Appearance.Accent"
+                  Disabled="@(!_editContext.Validate())"
+                  OnClick="@SaveAsync">
+        @Dialog.Instance.Parameters.PrimaryAction
+    </FluentButton>
+    <FluentButton Appearance="Appearance.Neutral"
+                  OnClick="@CancelAsync">
+        @Dialog.Instance.Parameters.SecondaryAction
+    </FluentButton>
+</FluentDialogFooter>
+
+@code {
+    [Parameter] 
+    public User Content { get; set; } = default!;
+
+    [CascadingParameter] 
+    public FluentDialog Dialog { get; set; } = default!;
+
+    private EditContext _editContext = default!;
+    private int _progressPercent;
+    private FluentInputFileEventArgs? _file;
+
+    private class SalaryValues
+    {
+        public decimal? FixedVal { get; set; }
+        public decimal? OverSelfSales { get; set; }
+        public decimal? OverAllSales { get; set; }
+    }
+
+    private SalaryValues? _salaryValues;
+    
+    protected override Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(Content.Salary))
+        {
+            _salaryValues = JsonSerializer.Deserialize<SalaryValues>(Content.Salary);
+        }
+        else
+        {
+            _salaryValues = new SalaryValues()
+            {
+                FixedVal = 0,
+                OverAllSales = 0,
+                OverSelfSales = 0
+            };
+        }
+        
+        _editContext = new EditContext(Content);
+        return base.OnInitializedAsync();
+    }
+
+    private async Task OnCompletedAsync(IEnumerable<FluentInputFileEventArgs> files)
+    {
+        _file = files.ToArray().First();
+
+        var buffer = new byte[_file.Size];
+        await _file.LocalFile.OpenRead().ReadAsync(buffer);
+        Content.Photo = $"data:{_file.ContentType};base64,{Convert.ToBase64String(buffer)}";
+
+        // Wait 3 seconds before to reset the progress bar.
+        await Task.Delay(3000);
+        _progressPercent = 0;
+    }
+    
+    private async Task SaveAsync()
+    {
+        if (_editContext.Validate())
+        {
+            Content.Salary = JsonSerializer.Serialize(_salaryValues);
+            await Dialog?.CloseAsync(Content);
+        }
+    }
+
+    private async Task CancelAsync()
+    {
+        await Dialog?.CancelAsync();
+    }
+
+}

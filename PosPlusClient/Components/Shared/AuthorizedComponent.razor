@@ -1,0 +1,44 @@
+﻿@using PosPlusClient.Components.Login
+@using PosPlusClient.Services
+@inject SimpleAuthenticationStateProvider AuthenticationStateProvider;
+@inject IDialogService DialogService
+
+@code {
+    [Parameter] public string? PermissionRequirement { get; set; }
+    protected UserAuthorizationState AuthorizationState;
+
+    protected override Task OnInitializedAsync()
+    {
+       var a = (PermissionAttribute)Attribute.GetCustomAttribute(typeof(ComponentBase), typeof(PermissionAttribute))!;
+            AuthorizationState = AuthenticationStateProvider.VerifyAuthorizationAsync(PermissionRequirement).GetAwaiter().GetResult();
+        return base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            DialogParameters parameters = new()
+            {
+                TrapFocus = true,
+                Modal = true,
+                PreventScroll = true,
+                Width = "400px"
+            };
+
+            var dialog = await DialogService.ShowDialogAsync<ElevationDialog>(null,parameters);
+            var result = await dialog.Result;
+
+            if (!result.Cancelled && result.Data != null)
+            {
+                AuthorizationState = UserAuthorizationState.Authorized;
+            }
+            else
+            {
+                AuthorizationState = UserAuthorizationState.UnAuthorized; 
+            }
+        }
+        StateHasChanged();
+    }
+
+}

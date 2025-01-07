@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <BlazorEnableCssIsolation>true</BlazorEnableCssIsolation>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.*-*" />
+      <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.11.0" />
+      <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Emoji" Version="4.11.0" />
+      <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.11.0" />
+      <PackageReference Include="Serilog.Settings.AppSettings" Version="3.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Middlewares\" />
+      <Folder Include="wwwroot\assets\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+    </ItemGroup>
+
+</Project>

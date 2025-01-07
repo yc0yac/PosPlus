@@ -1,0 +1,7 @@
+﻿.idea
+Core/bin
+Core/obj
+Infrastructure/bin
+Infrastructure/obj
+PosPlusClient/bin
+PosPlusClient/obj

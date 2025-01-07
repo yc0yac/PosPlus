@@ -1,0 +1,40 @@
+﻿@using PosPlusClient.Services
+@inject SimpleAuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+@inject AppState AppState;
+
+<FluentStack HorizontalAlignment="@HorizontalAlignment.End"
+             VerticalAlignment="@VerticalAlignment.Center"
+             Style="height: 48px; background: transparent; padding-inline-end: 10px; width: fit-content">
+    <FluentProfileMenu 
+        Image="@AppState?.UserProfile?.Photo"
+        Status="@PresenceStatus.Available"
+        HeaderLabel="PosPlus App"
+        FullName="@AppState?.UserProfile?.Name"
+        PopoverStyle="min-width: 330px;" 
+        OnHeaderButtonClick="@Logout"
+        HeaderButton="Cerrar Sesión"
+        FooterLink="Editar Perfil"
+    />
+</FluentStack>
+
+@code{
+    protected override void OnInitialized()
+    {
+        AppState.OnChange += StateHasChanged;
+    }
+    
+    private async Task Logout()
+    {
+        await AuthenticationStateProvider.LogoutAsync();
+        NavigationManager.NavigateTo("/");
+    }
+    
+    public void Dispose()
+    {
+        AppState.OnChange -= StateHasChanged;
+    }
+    
+}
