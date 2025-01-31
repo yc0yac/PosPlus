@@ -1,14 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿namespace Core.Domain.Entities;
 
-namespace Core.Domain.Entities;
-
-[Table("Permissions")]
-public sealed class Permission : Entity
+public partial class Permission
 {
-    [Column("name")]
-    public required string Name { get; set;}
-    [Column("description")]
-    public required string Description { get; set;}
-    [Column("area")]
-    public required string Area { get; set;}
+    public int Id { get; set; }
+
+    public string Name { get; set; } = null!;
+
+    public string Description { get; set; } = null!;
+
+    public string Area { get; set; } = null!;
+
+    public virtual ICollection<UsersPermission> UsersPermissions { get; set; } = new List<UsersPermission>();
 }

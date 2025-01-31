@@ -6,6 +6,7 @@ using Infrastructure.Persistence.Configuration;
 using Infrastructure.Persistence.Repositories;
 using Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using PosPlusClient.Components.Pages;
 using PosPlusClient.Services;
 using Serilog;
@@ -16,7 +17,10 @@ public static class ServiceExtension
 {
     public static void ConfigureContext(this IServiceCollection services, IConfiguration config)
     {
-        services.AddSingleton<ApplicationDbContext>();
+        services.AddDbContextFactory<ApplicationDbContext>(options =>
+        {
+            options.UseSqlite(config.GetConnectionString("default")).AddInterceptors(new SqlitePragmaInterceptor());
+        });
     }
 
     public static void ConfigureServices(this IServiceCollection services, IConfiguration config)

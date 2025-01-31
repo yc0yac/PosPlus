@@ -1,0 +1,30 @@
+﻿@page "/Categories"
+@using PosPlusClient.Services
+@using PosPlusClient.Components.Login
+@inherits AuthorizedComponent
+@inject IDialogService DialogService
+
+@if (AuthorizationState == UserAuthorizationState.Authorized)
+{
+    <h1>
+        Administración / Categorias de Productos
+    </h1>
+    <FluentMessageBar Title="Información:" Intent="MessageIntent.Info" AllowDismiss="false">
+        Permite mostrar los productos en categorias lo que facilita su manejo.
+    </FluentMessageBar>
+}
+
+@if (AuthorizationState == UserAuthorizationState.UnAuthorized)
+{
+    <AccessDenied/>
+}
+
+@code {
+    protected override Task OnInitializedAsync()
+    {
+        //Hay que especificar el Permiso
+        PermissionRequirement = "Productos";
+        //Hay que llamar el OnInitialize heredado que verifica el permiso
+        return base.OnInitializedAsync();
+    }
+}

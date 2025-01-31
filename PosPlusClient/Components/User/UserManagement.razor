@@ -171,7 +171,7 @@
 
         if (result is { Cancelled: false, Data: not null })
         {
-            var succes = await ServiceManager.User.UpdateUserPermissionsAsync(user, result.Data as IEnumerable<UserPermission>);
+            var succes = await ServiceManager.User.UpdateUserPermissionsAsync(user, result.Data as IEnumerable<UsersPermission>);
 
             if (succes)
             {

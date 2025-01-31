@@ -1,11 +1,13 @@
-﻿namespace Core.Contracts.Repositories;
+﻿using System.Linq.Expressions;
 
-public interface IGenericRepository<T>
+namespace Core.Contracts.Repositories;
+
+public interface IGenericRepository<TEntity>
 {
-    Task<T> GetById(int id);
-    Task<IEnumerable<T>> GetAll();
-    Task<int> CountAll();
-    Task<int> Add(T entity);
-    Task<int> Update(T entity);
-    Task<int> Delete(T entity);
+    Task<TEntity?> GetByIdAsync(int id);
+    Task<IEnumerable<TEntity>> GetAllAsync();
+    Task AddAsync(TEntity entity);
+    Task UpdateAsync(TEntity entity);
+    Task DeleteAsync(TEntity entity);
+    Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate);
 }

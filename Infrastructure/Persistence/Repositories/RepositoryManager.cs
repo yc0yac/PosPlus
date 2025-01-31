@@ -1,36 +1,40 @@
 ﻿using System.Data.SQLite;
 using Core.Contracts.Entities;
 using Core.Contracts.Repositories;
+using Core.Domain.Entities;
 using Dapper;
 using Infrastructure.Persistence.Configuration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace Infrastructure.Persistence.Repositories;
 
-public class RepositoryManager : IRepositoryManager
+public class RepositoryManager(IDbContextFactory<ApplicationDbContext> contextFactory) : IRepositoryManager
 {
-    //Implement Lazy Rep
-    private readonly Lazy<IUserRepository> _userRepository;
+    private readonly Lazy<IUserRepository> _lazyUserRepository = new(()=>new UsersRepository(contextFactory));
+    private readonly Lazy<ICategoriesRepository> _lazyCategoriesRepository = new(()=>new CategoriesRepository(contextFactory));
 
-    public RepositoryManager(ApplicationDbContext context)
-    {
-        Configure(context);
-        
-        _userRepository = new Lazy<IUserRepository>(() => new UsersRepository(context));
-    }
+    
+    
+    public IUserRepository User => _lazyUserRepository.Value; 
+    public ICategoriesRepository Category => _lazyCategoriesRepository.Value; 
 
-    //Get Implemented Rep
-    public IUserRepository User => _userRepository.Value;
+    
+
     
     
     
     
-    //Configure Repos
-    private void Configure(ApplicationDbContext context)
-    {
-        //Configure wal
-        using (var connection = context.CreateConnection())
-        {
-            connection.Execute("PRAGMA journal_mode=WAL;");
-        }
-    }
+    
+    
+    
+    
+    
+    
+  
+    
+
+    
+    
+    
 }

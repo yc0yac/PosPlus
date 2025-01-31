@@ -2,9 +2,6 @@
 @using PosPlusClient.Services
 @using PosPlusClient.Components.Login
 @inherits AuthorizedComponent
-@inject IDialogService DialogService
-
-@attribute [Permission("Devolver")]
 
 @if (AuthorizationState == UserAuthorizationState.Authorized)
 {

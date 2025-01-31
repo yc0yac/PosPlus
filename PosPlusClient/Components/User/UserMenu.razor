@@ -3,16 +3,16 @@
 @inject NavigationManager NavigationManager
 @implements IDisposable
 
-@inject AppState AppState;
+@inject AppStateProvider AppStateProvider;
 
 <FluentStack HorizontalAlignment="@HorizontalAlignment.End"
              VerticalAlignment="@VerticalAlignment.Center"
              Style="height: 48px; background: transparent; padding-inline-end: 10px; width: fit-content">
     <FluentProfileMenu 
-        Image="@AppState?.UserProfile?.Photo"
+        Image="@AppStateProvider?.UserProfile?.Photo"
         Status="@PresenceStatus.Available"
         HeaderLabel="PosPlus App"
-        FullName="@AppState?.UserProfile?.Name"
+        FullName="@AppStateProvider?.UserProfile?.Name"
         PopoverStyle="min-width: 330px;" 
         OnHeaderButtonClick="@Logout"
         HeaderButton="Cerrar Sesión"
@@ -23,7 +23,7 @@
 @code{
     protected override void OnInitialized()
     {
-        AppState.OnChange += StateHasChanged;
+        AppStateProvider.OnChange += StateHasChanged;
     }
     
     private async Task Logout()
@@ -34,7 +34,7 @@
     
     public void Dispose()
     {
-        AppState.OnChange -= StateHasChanged;
+        AppStateProvider.OnChange -= StateHasChanged;
     }
     
 }

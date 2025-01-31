@@ -2,6 +2,7 @@
 @using PosPlusClient.Services
 @inject SimpleAuthenticationStateProvider AuthenticationStateProvider;
 @inject IDialogService DialogService
+@inject AppStateProvider AppStateProvider;
 
 @code {
     [Parameter] public string? PermissionRequirement { get; set; }
@@ -9,14 +10,14 @@
 
     protected override Task OnInitializedAsync()
     {
-       var a = (PermissionAttribute)Attribute.GetCustomAttribute(typeof(ComponentBase), typeof(PermissionAttribute))!;
-            AuthorizationState = AuthenticationStateProvider.VerifyAuthorizationAsync(PermissionRequirement).GetAwaiter().GetResult();
+        //var a = (PermissionAttribute)Attribute.GetCustomAttribute(typeof(ComponentBase), typeof(PermissionAttribute))!;
+        AuthorizationState = AuthenticationStateProvider.VerifyAuthorizationAsync(PermissionRequirement).GetAwaiter().GetResult();
         return base.OnInitializedAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender && AppStateProvider.UserProfile is { Isadmin: false })
         {
             DialogParameters parameters = new()
             {

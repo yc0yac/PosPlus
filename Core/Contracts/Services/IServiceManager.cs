@@ -6,4 +6,5 @@ namespace Core.Contracts.Services;
 public interface IServiceManager
 {
     public IUserService User { get; }
+    public ICategoriesService Category { get; }
 }

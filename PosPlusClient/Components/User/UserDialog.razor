@@ -112,7 +112,7 @@
                     </div>
                     <div style="width: 100%">
                         <FluentCheckbox Name="admin"
-                                        @bind-Value="@Content.IsAdmin"
+                                        @bind-Value="@Content.Isadmin"
                                         Label="Administrador">
                         </FluentCheckbox>
                     </div>
@@ -125,7 +125,7 @@
                                      TextFieldType="TextFieldType.Password"
                                      Style="width: 100%"
                                      Appearance="FluentInputAppearance.Filled"
-                                     Disabled="@(!Content.IsAdmin)"/>
+                                     Disabled="@(!Content.Isadmin)"/>
                     <FluentValidationMessage For="@(() => Content.SharedPassword)"/>
                 </div>
                 <div style="width: 100%">

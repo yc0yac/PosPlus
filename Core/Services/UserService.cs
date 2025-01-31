@@ -10,61 +10,57 @@ public class UserService(IRepositoryManager repositoryManager, IPasswordServiceP
 {
     public async Task<IEnumerable<User>> GetAll()
     {
-        var users = await repositoryManager.User.GetAll();
+        var users = await repositoryManager.User.GetAllAsync();
         return users.ToList();
     }
 
     public async Task<bool> Delete(User user)
     {
-        return await repositoryManager.User.Delete(user) == 1;
+        await repositoryManager.User.DeleteAsync(user);
+        return true;
     }
 
     public async Task<bool> Create(User user)
     {
         user.Username = user.Username?.ToLower();
         user.Password = passwordServiceProvider.HashPassword(user.Password);
-        if (user.IsAdmin && !string.IsNullOrEmpty(user.SharedPassword))
+        if (user.Isadmin && !string.IsNullOrEmpty(user.SharedPassword))
         {
             user.SharedPassword = passwordServiceProvider.HashPassword(user.SharedPassword);
         }
-        return await repositoryManager.User.Add(user) == 1;
+        await repositoryManager.User.AddAsync(user);
+        return true;
     }
 
     public async Task<bool> Edit(User user)
     {
-        user.Username = user.Username?.ToLower();
+        user.Username = user.Username.ToLower();
         user.Password = passwordServiceProvider.HashPassword(user.Password);
-        if (user.IsAdmin && !string.IsNullOrEmpty(user.SharedPassword))
+        if (user.Isadmin && !string.IsNullOrEmpty(user.SharedPassword))
         {
             user.SharedPassword = passwordServiceProvider.HashPassword(user.SharedPassword);
         }
         
-        return await repositoryManager.User.Update(user) == 1;
+        await repositoryManager.User.UpdateAsync(user);
+        return true;
     }
 
-    public async Task<IEnumerable<UserPermission>> GetUserPermissionsAsync(User user)
+    public async Task<IEnumerable<UsersPermission>> GetUserPermissionsAsync(User user)
     {
-        var permissions = (await repositoryManager.User.GetUserPermissionsAsync(user.Id)).ToList();
-        //Set missing user id
-        foreach (var permission in permissions)
-        {
-            permission.IdUser = user.Id;
-        }
-
+        var permissions = (await repositoryManager.User.GetUserGeneralPermissionsAsync(user.Id)).ToList();
         return permissions;
     }
 
-    public async Task<bool> UpdateUserPermissionsAsync(User user, IEnumerable<UserPermission> permissions)
+    public async Task<bool> UpdateUserPermissionsAsync(User user, IEnumerable<UsersPermission> permissions)
     {
-        var result =
             await repositoryManager.User.UpdateUserPermissionsAsync(user.Id,
                 permissions.Where(p => p.Granted || p.RequestElevation));
-        return result > 0;
+        return true;
     }
 
     public async Task<User?> ValidateCredentials(string username, string password)
     {
-        var user = await repositoryManager.User.GetByUsername(username);
+        var user = await repositoryManager.User.GetByUsernameAsync(username);
         if (user != null)
         {
             if (!passwordServiceProvider.VerifyPassword(password,user.Password))
@@ -74,13 +70,13 @@ public class UserService(IRepositoryManager repositoryManager, IPasswordServiceP
 
             user.Password = null;
         }
-        user.Permissions = (await GetUserPermissionsAsync(user)).ToList();
+        
         return user;
     }
     
     public async Task<User?> ValidateSharedPassword(string password)
     {
-        var users = await repositoryManager.User.GetAllAdmins();
+        var users = await repositoryManager.User.GetAllAdminsAsync();
 
         if (users != null)
         {

@@ -1,50 +1,48 @@
-﻿using System.Collections;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿namespace Core.Domain.Entities;
 
-namespace Core.Domain.Entities;
-
-[Table("Users")]
-public sealed class User : Entity
+public partial class User
 {
-    [Required, MinLength(5)]
-    [Column("name")]
+    public int Id { get; set; }
+
     public string Name { get; set; } = null!;
 
-    [Required, MinLength(5)]
-    [Column("username")]
-    public string Username { get; set; } = null!;
-
-    [Required, MinLength(8)]
-    [Column("password")]
     public string Password { get; set; } = null!;
 
-    [Column("disabled")] public bool Disabled { get; set; }
+    public string Username { get; set; } = null!;
 
-    [Column("photo")] public string? Photo { get; set; }
+    public string? Photo { get; set; }
 
-    [Column("email"), MaxLength(64)] public string? Email { get; set; }
+    public bool Disabled { get; set; }
 
-    [Column("salary"), MaxLength(256)] public string? Salary { get; set; }
+    public string? Email { get; set; }
 
-    [Column("position"), MaxLength(512)] public string? Position { get; set; }
+    public string? Salary { get; set; }
 
-    [Column("isadmin")] public bool IsAdmin { get; set; }
+    public string? Position { get; set; }
 
-    [Column("shared_password")] public string? SharedPassword { get; set; }
+    public bool Isadmin { get; set; }
 
-    [NotMapped] public List<UserPermission>? Permissions { get; set; }
+    public string? SharedPassword { get; set; }
 
-    public string? PermissionGrantedString()
+    public virtual ICollection<Move> Moves { get; set; } = new List<Move>();
+
+    public virtual ICollection<Turn> Turns { get; set; } = new List<Turn>();
+
+    public virtual ICollection<UsersPermission> UsersPermissions { get; set; } = new List<UsersPermission>();
+    
+    public string PermissionGrantedString() => GetPermissionString(p => p.Granted);
+
+    public string PermissionWithElevationString() => GetPermissionString(p => p.RequestElevation);
+
+    private string GetPermissionString(Func<UsersPermission, bool> predicate)
     {
-        if (Permissions == null || Permissions.Count == 0) return string.Empty;
-        return string.Join(',', Permissions.Where(p => p.Granted).Select(permission => permission.Name));
-    }
+        if (UsersPermissions?.Count == 0)
+        {
+            return string.Empty;
+        }
 
-    public string? PermissionWithElevationString()
-    {
-        if (Permissions == null || Permissions.Count == 0) return string.Empty;
-        return string.Join(',', Permissions.Where(p => p.RequestElevation).Select(permission => permission.Name));
+        return string.Join(',', UsersPermissions?
+            .Where(predicate)
+            .Select(p => p.IdPermissionNavigation?.Name) ?? []);
     }
-   
 }

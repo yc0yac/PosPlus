@@ -4,135 +4,74 @@ using Core.Contracts.Repositories;
 using Core.Domain.Entities;
 using Dapper;
 using Infrastructure.Persistence.Configuration;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories;
 
-public class UsersRepository : GenericRepository<User>, IUserRepository
+public class UsersRepository(IDbContextFactory<ApplicationDbContext> contextFactory) : GenericRepository<User>(contextFactory), IUserRepository
 {
-    private readonly IDbConnection _connection;
-
-    public UsersRepository(ApplicationDbContext context) : base(context)
+    public async Task<User?> GetByUsernameAsync(string username)
     {
-        _connection = context.CreateConnection();
+        var context = await contextFactory.CreateDbContextAsync();
+        return await context.Users.Include(u=>u.UsersPermissions).FirstOrDefaultAsync(u => u.Username.ToUpper().Equals(username.ToUpper()));
     }
 
-    public async Task<User?> GetByUsername(string username)
+    public async Task<List<User>?> GetAllAdminsAsync()
     {
-        User? result;
-        try
-        {
-            const string query = "SELECT * FROM Users WHERE lower(Users.username) = lower(@username)";
-
-            result = await _connection.QuerySingleOrDefaultAsync<User>(query, new { username });
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error fetching a record from db: ${ex.Message}");
-            throw new Exception("Unable to fetch data. Please contact the administrator.");
-        }
-        finally
-        {
-            _connection.Close();
-        }
-
-        return result;
+        var context = await contextFactory.CreateDbContextAsync();
+        return await context.Users.Where(u => u.Isadmin).AsNoTracking().ToListAsync();
     }
 
-    public async Task<List<User>?> GetAllAdmins()
+    public async Task<IEnumerable<UsersPermission>> GetUserGeneralPermissionsAsync(int userId)
     {
-        List<User> result;
-        try
-        {
-            const string query = "SELECT shared_password as sharedpassword,isadmin,position,salary,email,disabled,photo,username,password,name,id FROM Users WHERE Users.isadmin = 1 and Users.disabled = 0";
+        var context = await contextFactory.CreateDbContextAsync();
+        var allPermissions = await context.Permissions.AsNoTracking().ToListAsync();
+        var userPermissions = await context.UsersPermissions.Where(up => up.IdUser==userId).Include(up=>up.IdPermissionNavigation).AsNoTracking().ToListAsync();
 
-            result = (await _connection.QueryAsync<User>(query)).ToList();
-        }
-        catch (Exception ex)
+        foreach (var ap in allPermissions.Where(ap => !userPermissions.Exists(up => up.IdPermission == ap.Id)))
         {
-            Console.WriteLine($"Error fetching a record from db: ${ex.Message}");
-            throw new Exception("Unable to fetch data. Please contact the administrator.");
-        }
-        finally
-        {
-            _connection.Close();
-        }
-
-        return result;
-    }
-
-    public async Task<IEnumerable<UserPermission>> GetUserPermissionsAsync(int userId)
-    {
-        IEnumerable<UserPermission> result;
-        try
-        {
-            const string query = "SELECT P.id, P.name, P.description, P.area, " +
-                                 "PU.id_user, PU.granted, PU.request_elevation AS RequestElevation " +
-                                 "FROM Permissions AS P " +
-                                 "LEFT JOIN (SELECT * FROM Users_Permissions " +
-                                 "WHERE Users_Permissions.id_user = @UserId) AS PU " +
-                                 "ON P.id = PU.id_permission";
-
-            result = await _connection.QueryAsync<UserPermission>(query, new { UserId = userId });
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error fetching records from db: ${ex.Message}");
-            throw new Exception("Unable to fetch data. Please contact the administrator.");
-        }
-        finally
-        {
-            _connection.Close();
-        }
-
-        return result;
-    }
-
-    public async Task<int> UpdateUserPermissionsAsync(int userId, IEnumerable<UserPermission> permissions)
-    {
-        const string deleteSql = "DELETE FROM Users_Permissions WHERE id_user = @UserId";
-        const string insertSql = "INSERT INTO Users_Permissions (id_user, id_permission, granted, request_elevation) VALUES  (@IdUser, @PermissionId, @Granted, @RequestElevation)";
-
-        var trimmedPermissions = new List<object>();
-        foreach (var permission in permissions)
-        {
-            trimmedPermissions.Add(new
+            userPermissions.Add(new UsersPermission()
             {
-                IdUser = permission.IdUser, PermissionId = permission.Id, Granted = permission.Granted,
-                RequestElevation = permission.RequestElevation
+                Granted = false,
+                IdPermission = ap.Id,
+                IdUser = userId,
+                RequestElevation = false,
+                IdPermissionNavigation = new Permission()
+                {
+                    Name = ap.Name,
+                    Area = ap.Area,
+                    Description = ap.Description
+                }
             });
         }
 
-        var rowsAffected = -1;
+        return userPermissions;
+    }
 
-        try
+    public async Task UpdateUserPermissionsAsync(int userId, IEnumerable<UsersPermission> permissions)
+    {
+        var context = await contextFactory.CreateDbContextAsync();
+        
+        // Obtener el usuario
+        var user = await context.Users
+            .Include(u => u.UsersPermissions) // Incluir los permisos actuales
+            .FirstOrDefaultAsync(u => u.Id == userId);
+        
+        // Filtrar solo los permisos válidos
+        var validPermissions = permissions.Where(up => up.Granted || up.RequestElevation).ToList();
+
+        // Eliminar los permisos antiguos del usuario
+        context.UsersPermissions.RemoveRange(user.UsersPermissions);
+       
+        // Eliminar Navegacion a permisos
+        foreach (var permission in validPermissions)
         {
-            _connection.Open();
-            using (var transaction = _connection.BeginTransaction())
-            {
-                try
-                {
-                    //First delete al user permissions
-                    rowsAffected += await _connection.ExecuteAsync(deleteSql, new { UserId = userId });
-                    //Insert the permissions
-                    rowsAffected += await _connection.ExecuteAsync(insertSql, trimmedPermissions);
-                    transaction.Commit();
-                }
-                catch (Exception)
-                {
-                    transaction.Rollback();
-                    throw;
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            return -1;
-        }
-        finally
-        {
-            _connection.Close();
+            permission.IdPermissionNavigation = null;
         }
 
-        return rowsAffected;
+        // Agregar los nuevos permisos
+        user.UsersPermissions = validPermissions;
+        
+        await context.SaveChangesAsync();
     }
 }

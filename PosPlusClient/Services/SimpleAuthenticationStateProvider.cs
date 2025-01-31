@@ -12,7 +12,7 @@ namespace PosPlusClient.Services
         UnAuthorized = 2
     }
 
-    public class SimpleAuthenticationStateProvider(IServiceManager serviceManager, AppState appState)
+    public class SimpleAuthenticationStateProvider(IServiceManager serviceManager, AppStateProvider appStateProvider)
         : AuthenticationStateProvider
     {
         private User? _currentUser;
@@ -38,7 +38,7 @@ namespace PosPlusClient.Services
         public async Task<bool> LoginAsync(string username, string password)
         {
             _currentUser = await serviceManager.User.ValidateCredentials(username, password);
-            appState.UserProfile = _currentUser;
+            appStateProvider.UserProfile = _currentUser;
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
 
             return _currentUser != null;
@@ -53,6 +53,11 @@ namespace PosPlusClient.Services
 
         public Task<UserAuthorizationState> VerifyAuthorizationAsync(string? requiredPermission)
         {
+            if (_currentUser.Isadmin)
+            {
+                return Task.FromResult(UserAuthorizationState.Authorized);   
+            }
+
             if (_currentAuthenticationState == null || requiredPermission == null)
             {
                 return Task.FromResult(UserAuthorizationState.UnAuthorized);

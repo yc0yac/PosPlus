@@ -27,7 +27,7 @@ try
         provider.GetRequiredService<SimpleAuthenticationStateProvider>());
     
     //AppState
-    builder.Services.AddScoped<AppState>();
+    builder.Services.AddScoped<AppStateProvider>();
 
     var app = builder.Build();
 

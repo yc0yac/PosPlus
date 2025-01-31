@@ -1,0 +1,25 @@
+﻿@page "/Products"
+@using PosPlusClient.Services
+@using PosPlusClient.Components.Login
+@inherits AuthorizedComponent
+@inject IDialogService DialogService
+
+@if (AuthorizationState == UserAuthorizationState.Authorized)
+{
+    <h1>Administración - Clientes</h1>
+}
+
+@if (AuthorizationState == UserAuthorizationState.UnAuthorized)
+{
+    <AccessDenied/>
+}
+
+@code {
+    protected override Task OnInitializedAsync()
+    {
+        //Hay que especificar el Permiso
+        PermissionRequirement = "Productos";
+        //Hay que llamar el OnInitialize heredado que verifica el permiso
+        return base.OnInitializedAsync();
+    }
+}
