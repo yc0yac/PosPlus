@@ -18,7 +18,7 @@
     <TemplateColumn Title="Disabled" Sortable="true" Width="128px" Style="text-align: center" Align="Align.Center">
         <FluentCheckbox Value="@context.Disabled" ReadOnly="true"/>
     </TemplateColumn>
-    <TemplateColumn Title="Actions" Align="Align.Center">
+    <TemplateColumn Title="Acciones" Align="Align.Center">
         <FluentButton aria-label="Edit item" IconEnd="@(new Regular.Size24.Edit())"
                       OnClick="@(() => OpenDialogAsync(context, "Editar"))"/>
         <FluentButton aria-label="UserDialog item" IconEnd="@(new Regular.Size24.Delete())"

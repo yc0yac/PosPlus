@@ -13,7 +13,7 @@ public class UsersRepository(IDbContextFactory<ApplicationDbContext> contextFact
     public async Task<User?> GetByUsernameAsync(string username)
     {
         var context = await contextFactory.CreateDbContextAsync();
-        return await context.Users.Include(u=>u.UsersPermissions).FirstOrDefaultAsync(u => u.Username.ToUpper().Equals(username.ToUpper()));
+        return await context.Users.Include(u=>u.UsersPermissions).ThenInclude(p=>p.IdPermissionNavigation).FirstOrDefaultAsync(u => u.Username.ToUpper().Equals(username.ToUpper()));
     }
 
     public async Task<List<User>?> GetAllAdminsAsync()

@@ -10,11 +10,11 @@ public partial class Product
 
     public string? Description { get; set; }
 
-    public byte[]? Image { get; set; }
+    public string? Image { get; set; }
 
-    public int? Composed { get; set; }
+    public bool Composed { get; set; }
 
-    public int? Unitary { get; set; }
+    public bool Unitary { get; set; }
 
     public string? Um { get; set; }
 

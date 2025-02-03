@@ -1,0 +1,192 @@
+﻿@page "/Categories"
+@using System.Reflection
+@using System.Text.Json
+@using Core.Services
+@using PosPlusClient.Services
+@using PosPlusClient.Components.Login
+@using PosPlusClient.Helpers
+@using Serilog
+@inherits AuthorizedComponent
+@inject IDialogService DialogService
+@inject IServiceManager ServiceManager
+@inject IToastService ToastService
+@inject AppStateProvider AppState
+
+@if (AuthorizationState == UserAuthorizationState.Authorized)
+{
+    <h1>
+        Administración / Categorias de Productos
+    </h1>
+    <FluentMessageBar Title="Información:" Intent="MessageIntent.Info" AllowDismiss="false">
+        Permite mostrar los productos en categorias lo que facilita su manejo.
+    </FluentMessageBar>
+    <FluentDataGrid ref="@_grid" Items="Categories" TGridItem="Category" RowSize="DataGridRowSize.Large">
+        <PropertyColumn Property="@(p => p.Name)" Sortable="true" Title="Nombre" Align="Align.Center"/>
+        <TemplateColumn Title="Acciones" Align="Align.Center">
+            <FluentButton aria-label="Edit item" IconEnd="@(new Regular.Size24.Edit())"
+                          OnClick="@(() => OpenDialogAsync(context, "Editar"))"/>
+            <FluentButton aria-label="UserDialog item" IconEnd="@(new Regular.Size24.Delete())"
+                          OnClick="() => ShowDeleteConfirmationAsync(context)"/>
+        </TemplateColumn>
+    </FluentDataGrid>
+
+    <FluentButton
+        Style="position: fixed; bottom: 65px;right: 25px; border-radius: 50%; width: 56px; height: 56px; box-shadow: #929292 2px 2px 5px"
+        Appearance="Appearance.Accent"
+        IconEnd="@(new Regular.Size32.Add())"
+        Id="floating-plus-btn-category"
+        OnClick="@(() => OpenDialogAsync(new Category(){Name="Nueva Categoria"}, "Crear"))"
+    />
+
+    <FluentTooltip Anchor="floating-plus-btn-category" Position="TooltipPosition.Left">
+        <strong>Adicionar</strong><br/>Categoria
+    </FluentTooltip>
+}
+
+@if (AuthorizationState == UserAuthorizationState.UnAuthorized)
+{
+    <AccessDenied/>
+}
+
+@code {
+    private IQueryable<Category>? Categories { get; set; }
+    private FluentDataGrid<Category>? _grid;
+    
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+        //Hay que especificar el Permiso
+        PermissionRequirement = "Categories";
+        //Hay que llamar el OnInitialize heredado que verifica el permiso
+        await base.OnInitializedAsync();
+    }
+    
+    private async Task LoadData()
+    {
+        try
+        {
+            _grid?.SetLoadingState(true);
+            Categories = (await ServiceManager.Category.GetAll()).AsQueryable();
+            _grid?.SetLoadingState(false);
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, $"Exception >>user: {AppState.UserProfile?.Username}");
+            var dialog = await DialogService.ShowErrorAsync("Ha ocurrido un error, contacte soporte técnico.", "Error", "Aceptar");
+            await dialog.Result;
+        }        
+    }
+    
+    private async Task ShowDeleteConfirmationAsync(Category category)
+    {
+        try
+        {
+            var dialog = await DialogService.ShowConfirmationAsync(
+                $"Está seguro de borrar la categoria <strong>{category.Name}</strong>? <br/><br/> La operación es Irreversible.",
+                "Si, deseo continuar",
+                "No", "Eliminar Categoria");
+
+            if (!(await dialog.Result).Cancelled)
+            {
+                var deleted = await ServiceManager.Category.Delete(category);
+
+                if (deleted)
+                {
+                    LoadData();
+                    ToastService.ShowCommunicationToast(new ToastParameters<CommunicationToastContent>()
+                    {
+                        Intent = ToastIntent.Success,
+                        Title = "Exito",
+                        Timeout = 5000,
+                        Content = new CommunicationToastContent()
+                        {
+                            Subtitle = $"La Categoria: {category.Name}",
+                            Details = "Fue eliminada exitosamente.",
+                        },
+                    });
+                }
+                else
+                {
+                    ToastService.ShowCommunicationToast(new ToastParameters<CommunicationToastContent>()
+                    {
+                        Intent = ToastIntent.Error,
+                        Title = "Error",
+                        Timeout = 5000,
+                        Content = new CommunicationToastContent()
+                        {
+                            Subtitle = $"La Categoria: {category.Name}",
+                            Details = "No pudo ser eliminada.",
+                        },
+                    });
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, $"Exception >>user: {AppState.UserProfile?.Username} >>data: {JsonSerializer.Serialize(category)}");
+            var dialog = await DialogService.ShowErrorAsync("Ha ocurrido un error, contacte soporte técnico.", "Error", "Aceptar");
+            await dialog.Result;
+        }
+    }
+    private async Task OpenDialogAsync(Category category, string action)
+    {
+        try
+        {
+            DialogParameters parameters = new()
+            {
+                Title = $"{action} Categoria",
+                PrimaryAction = action,
+                SecondaryAction = "Cancelar",
+                Width = "500px",
+                TrapFocus = true,
+                Modal = true,
+                PreventScroll = true
+            };
+
+            var dialog = await DialogService.ShowDialogAsync<CategoryDialog>(category, parameters);
+            var result = await dialog.Result;
+
+            if (result is { Cancelled: false, Data: not null })
+            {
+                var succes = action == "Crear" ? await ServiceManager.Category.Create(category) : await ServiceManager.Category.Edit(category);
+
+                if (succes)
+                {
+                    LoadData();
+                    ToastService.ShowCommunicationToast(new ToastParameters<CommunicationToastContent>()
+                    {
+                        Intent = ToastIntent.Success,
+                        Title = "Exito",
+                        Timeout = 5000,
+                        Content = new CommunicationToastContent()
+                        {
+                            Subtitle = $"La categoria: {category.Name}",
+                            Details = $"Fue {(action == "Crear" ? "creada" : "editada")} exitosamente.",
+                        },
+                    });
+                }
+                else
+                {
+                    ToastService.ShowCommunicationToast(new ToastParameters<CommunicationToastContent>()
+                    {
+                        Intent = ToastIntent.Error,
+                        Title = "Error",
+                        Timeout = 5000,
+                        Content = new CommunicationToastContent()
+                        {
+                            Subtitle = $"La categoria {category.Name}",
+                            Details = $"No pudo ser {(action == "Crear" ? "creada" : "editada")}.",
+                        },
+                    });
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, $"Exception >>user: {AppState.UserProfile?.Username} >>data: {JsonSerializer.Serialize(category)}");
+            var dialog = await DialogService.ShowErrorAsync("Ha ocurrido un error, contacte soporte técnico.", "Error", "Aceptar");
+            await dialog.Result;
+        }
+    }
+}

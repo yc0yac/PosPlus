@@ -7,4 +7,5 @@ public interface IServiceManager
 {
     public IUserService User { get; }
     public ICategoriesService Category { get; }
+    public IProductService Product { get; }
 }

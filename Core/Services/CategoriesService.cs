@@ -20,17 +20,29 @@ public class CategoriesService(IRepositoryManager repositoryManager) : ICategori
         return true;
     }
 
-    public async Task<bool> Create(Category Category)
+    public async Task<bool> Create(Category category)
     {
-        await repositoryManager.Category.AddAsync(Category);
+        var exists = await repositoryManager.Category.ExistsAsync(c => c.Name.ToLower() == category.Name.ToLower());
+
+        if (exists)
+        {
+            return false;
+        }
+
+        await repositoryManager.Category.AddAsync(category);
         return true;
     }
 
-    public async Task<bool> Edit(Category Category)
+    public async Task<bool> Edit(Category category)
     {
-        await repositoryManager.Category.UpdateAsync(Category);
+        var exists = await repositoryManager.Category.ExistsAsync(c => c.Name.ToLower() == category.Name.ToLower());
+
+        if (exists)
+        {
+            return false;
+        }
+
+        await repositoryManager.Category.UpdateAsync(category);
         return true;
     }
-
-    
 }

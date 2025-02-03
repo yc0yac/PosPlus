@@ -1,0 +1,134 @@
+﻿@using Serilog
+@inject HttpClient Http
+
+<FluentSearch @bind-Value="_searchQuery"
+              @bind-Value:after="@SearchImages"
+              Immediate="true"
+              Embedded="true"
+              ImmediateDelay="ImmediateDelay"
+              Placeholder="Search for name"
+              style="width: 256px;"/>
+
+
+<FluentCard Width="256px" Height="256px" >
+    @if (_images.Count > 0)
+    {
+        <FluentStack Orientation="Orientation.Horizontal" Wrap="true" HorizontalAlignment="HorizontalAlignment.Center">
+            @foreach (var image in _images)
+            {
+                <FluentPersona Image="@image.Urls?.ThumbResult" ImageSize="96px" OnClick="@((arg) => SelectImage(image.Urls?.ThumbResult))"/>
+            }
+        </FluentStack>
+    }
+    else
+    {
+        <FluentStack HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center">
+            <FluentLabel>No hay resultados.</FluentLabel>
+        </FluentStack>
+    }
+    @if(_finding)
+    {
+        <FluentOverlay @bind-Visible=@_finding>
+            <FluentProgressRing />
+        </FluentOverlay>
+    }
+    @{ _finding = false; }
+</FluentCard>
+
+
+
+
+
+@code {
+    [Parameter]
+    public EventCallback<string> OnValueChanged { get; set; }
+
+    private string? _searchQuery;
+    private const int ImmediateDelay = 2000;
+    private List<ImageResult> _images = [];
+    private bool _finding;
+
+    private async Task SelectImage(string? data)
+    {
+        await OnValueChanged.InvokeAsync(data);
+    }
+
+    private async Task SearchImages()
+    {
+        _finding = true;
+        if (string.IsNullOrWhiteSpace(_searchQuery))
+        {
+            _images = [];
+            _finding = false;
+            return;
+        }
+
+        const string accessKey = "FArL7c1c06Dt8fNSyWMEolOp5jkP7CIEPxZE5ayLJpY"; // Replace with your Unsplash Access Key
+        var url = $"https://api.unsplash.com/search/photos?query={Uri.EscapeDataString(_searchQuery)}&client_id={accessKey}&per_page={4}&lang=es&orientation=landscape&order_by=popular";
+
+        try
+        {
+            var response = await Http.GetFromJsonAsync<UnsplashResponse>(url);
+            _images = response?.Results ?? [];
+
+            foreach (var img in _images)
+            {
+                if (img.Urls != null)
+                {
+                    img.Urls.ThumbResult = FetchAndConvertImage(img.Urls.Thumb);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching images: {ex.Message}");
+            _images = [];
+        }
+        finally
+        {
+            _finding = false;
+        }
+    }
+
+    public class UnsplashResponse
+    {
+        public List<ImageResult> Results { get; set; } = [];
+    }
+
+    public class ImageResult
+    {
+        public string? Description { get; set; }
+        public ImageUrls? Urls { get; set; }
+    }
+
+    public class ImageUrls
+    {
+        public string? Thumb { get; set; }
+        public string? ThumbResult { get; set; }
+    }
+
+    private string FetchAndConvertImage(string? imageUrl)
+    {
+       
+        if (string.IsNullOrWhiteSpace(imageUrl))
+        {
+            return "";
+        }
+
+        try
+        {
+            // Fetch the image as a byte array
+            var response = Http.GetByteArrayAsync(imageUrl);
+            // Convert the byte array to a base64 string
+            return $"data:image/jpeg;base64,{Convert.ToBase64String(response.Result)}";
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, $"Exception >> Obteniendo imagen desde url.");
+        }
+        
+        return "";
+    }
+
+
+}

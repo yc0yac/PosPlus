@@ -64,7 +64,6 @@ public partial class ApplicationDbContext : DbContext
         modelBuilder.Entity<Category>(entity =>
         {
             entity.Property(e => e.Id)
-                .ValueGeneratedNever()
                 .HasColumnName("id");
             entity.Property(e => e.Name).HasColumnType("TEXT(256)");
         });
@@ -74,7 +73,6 @@ public partial class ApplicationDbContext : DbContext
             entity.ToTable("Client");
 
             entity.Property(e => e.Id)
-                .ValueGeneratedNever()
                 .HasColumnName("id");
             entity.Property(e => e.Address).HasColumnType("TEXT(512)");
             entity.Property(e => e.Email).HasColumnType("TEXT(64)");
@@ -293,10 +291,10 @@ public partial class ApplicationDbContext : DbContext
             entity.HasIndex(e => e.Id, "id_idx").IsUnique();
 
             entity.Property(e => e.Id)
-                .ValueGeneratedNever()
                 .HasColumnName("id");
             entity.Property(e => e.Composed)
                 .HasColumnType("integer(1)")
+                .HasConversion<int>()
                 .HasColumnName("composed");
             entity.Property(e => e.Description)
                 .HasColumnType("text(1024)")
@@ -311,6 +309,7 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("um");
             entity.Property(e => e.Unitary)
                 .HasColumnType("integer(1)")
+                .HasConversion<int>()
                 .HasColumnName("unitary");
 
             entity.HasOne(d => d.IdCategoryNavigation).WithMany(p => p.Products)

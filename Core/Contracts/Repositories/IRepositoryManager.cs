@@ -6,4 +6,5 @@ public interface IRepositoryManager
 {
     IUserRepository User { get; }
     ICategoriesRepository Category { get; }
+    IProductsRepository Product { get; }
 }

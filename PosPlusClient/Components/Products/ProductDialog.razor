@@ -1,0 +1,217 @@
+﻿@using PosPlusClient.Helpers
+@implements IDialogContentComponent<Product>
+@inject IServiceManager ServiceManager
+@inject IDialogService DialogService
+
+<FluentDialogHeader ShowDismiss="true">
+    <FluentStack VerticalAlignment="VerticalAlignment.Center">
+        @if (Dialog.Instance.Parameters.PrimaryAction == "Crear")
+        {
+            <FluentIcon Value="@(new Regular.Size24.Add())"/>
+        }
+        else
+        {
+            <FluentIcon Value="@(new Regular.Size24.Edit())"/>
+        }
+
+        <FluentLabel Typo="Typography.PaneHeader">
+            @Dialog?.Instance.Parameters.Title
+        </FluentLabel>
+    </FluentStack>
+</FluentDialogHeader>
+
+<FluentDialogBody>
+    <FluentEditForm EditContext="@_editContext" FormName="frm_product" novalidate>
+        <DataAnnotationsValidator/>
+        <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.Stretch">
+            <FluentStack Orientation="Orientation.Vertical" HorizontalAlignment="HorizontalAlignment.Center">
+                <FluentInputFile Id="my-file-uploader"
+                                 Mode="InputFileMode.SaveToTemporaryFolder"
+                                 Multiple="false"
+                                 MaximumFileCount="1"
+                                 MaximumFileSize="@(10 * 1024 * 1024)"
+                                 Accept="image/*"
+                                 @bind-ProgressPercent="@_progressPercent"
+                                 OnCompleted="@OnCompletedAsync" style="padding: 5px">
+                    <ChildContent>
+                        <div style="display: flex;justify-content: center;">
+                            <FluentPersona Image="@Content.Image"
+                                           ImageSize="112px"
+                                           TextPosition="TextPosition.Start"
+                                           Initials="@Content.Name.GetInitials()">
+                            </FluentPersona>
+                        </div>
+                        <label for="my-file-uploader">
+                            <FluentIcon Value="@(new Regular.Size24.ArrowUpload())"/>
+                        </label>
+                        <div>
+                            Arrastra una foto para agregarla, buscala
+                            en el <label for="my-file-uploader">equipo</label> o desde <label onclick="@OpenImageSearchDialogAsync" >internet</label> <span style="color: red;">*</span>.
+                        </div>
+                    </ChildContent>
+                </FluentInputFile>
+            </FluentStack>
+            <FluentStack Orientation="Orientation.Vertical">
+                <div style="width: 100%">
+                    <FluentTextField Name="frm_product_name"
+                                     @bind-Value="@Content.Name"
+                                     Label="Nombre:"
+                                     Required
+                                     Style="width: 100%"
+                                     Appearance="FluentInputAppearance.Filled"/>
+                    <FluentValidationMessage For="@(() => Content.Name)"/>
+                </div>
+                <div style="width: 100%">
+                    <FluentTextField Name="frm_product_description"
+                                     @bind-Value="@Content.Description"
+                                     Label="Descripción:"
+                                     Required
+                                     Style="width: 100%"
+                                     Appearance="FluentInputAppearance.Filled"/>
+                    <FluentValidationMessage For="@(() => Content.Description)"/>
+                </div>
+                <div style="width: 100%">
+                    <FluentSelect Name="frm_product_category"
+                                  TOption="Option<int>"
+                                  Items="_categories"
+                                  OptionText="c=>c.Text"
+                                  OptionValue="c=>c.Value.ToString()"
+                                  @bind-Value="@_selectedCategory"
+                                  Label="Categoria"
+                                  Required
+                                  Style="width: 100%"
+                                  OptionSelected="OptionSelected"/>
+                    @{
+                        bool OptionSelected(Option<int> arg)
+                        {
+                            Content.IdCategory = arg.Value;
+                            return true;
+                        }
+                    }
+
+                    <FluentValidationMessage For="@(() => Content.IdCategory)"/>
+                </div>
+                <FluentStack Orientation="Orientation.Horizontal">
+                    <div style="width: 100%">
+                        <FluentCheckbox Name="frm_product_unitary"
+                                        @bind-Value="@Content.Unitary"
+                                        Label="Unitario">
+                        </FluentCheckbox>
+                        <FluentCheckbox Name="frm_product_composed"
+                                        @bind-Value="@Content.Composed"
+                                        Label="Compuesto">
+                        </FluentCheckbox>
+                    </div>
+                </FluentStack>
+                <div style="width: 100%">
+                    <FluentTextField Name="frm_product_um"
+                                     @bind-Value="@Content.Um"
+                                     Label="Unidad Medida"
+                                     Style="width: 100%"
+                                     Appearance="FluentInputAppearance.Filled"/>
+                </div>
+            </FluentStack>
+            <FluentDivider Orientation="Orientation.Vertical" Role="DividerRole.Separator"/>
+            <FluentStack Orientation="Orientation.Vertical">
+                <div style="width: 100%">
+                    <FluentTextField Name="frm_product_name"
+                                     @bind-Value="@Content.Name"
+                                     Label="Nombre:"
+                                     Required
+                                     Style="width: 100%"
+                                     Appearance="FluentInputAppearance.Filled"/>
+                    <FluentValidationMessage For="@(() => Content.Name)"/>
+                </div>
+                <div style="width: 100%">
+                    <FluentTextField Name="frm_product_description"
+                                     @bind-Value="@Content.Description"
+                                     Label="Descripción:"
+                                     Required
+                                     Style="width: 100%"
+                                     Appearance="FluentInputAppearance.Filled"/>
+                    <FluentValidationMessage For="@(() => Content.Description)"/>
+                </div>
+            </FluentStack>
+        </FluentStack>
+    </FluentEditForm>
+</FluentDialogBody>
+<FluentDialogFooter>
+    <FluentButton Appearance="Appearance.Accent"
+                  Disabled="@(!_editContext.Validate())"
+                  OnClick="@SaveAsync">
+        @Dialog.Instance.Parameters.PrimaryAction
+    </FluentButton>
+    <FluentButton Appearance="Appearance.Neutral"
+                  OnClick="@CancelAsync">
+        @Dialog.Instance.Parameters.SecondaryAction
+    </FluentButton>
+</FluentDialogFooter>
+a
+<FluentPopover Style="width: 285px;" HorizontalPosition="HorizontalPosition.Center" VerticalPosition="VerticalPosition.Center" AnchorId="@Dialog.Id" @bind-Open="_openSearch" >
+    <Body>
+    <ProductImageSearch OnValueChanged="@HandleValueChanged"/>
+    </Body>
+</FluentPopover>
+
+@code {
+    [Parameter] public Product Content { get; set; } = default!;
+
+    [CascadingParameter] public FluentDialog Dialog { get; set; } = default!;
+    
+    private EditContext _editContext = default!;
+    private int _progressPercent;
+    private FluentInputFileEventArgs? _file;
+
+    private readonly List<Option<int>> _categories = [];
+    private string _selectedCategory;
+    private bool _openSearch;
+
+    private void HandleValueChanged(string value)
+    {
+        Content.Image = value;
+        _openSearch = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        foreach (var category in await ServiceManager.Category.GetAll())
+        {
+            _categories.Add(new Option<int> { Value = category.Id, Text = category.Name });
+        }
+
+        _editContext = new EditContext(Content);
+        await base.OnInitializedAsync();
+    }
+
+    private async Task OnCompletedAsync(IEnumerable<FluentInputFileEventArgs> files)
+    {
+        _file = files.ToArray().First();
+
+        var buffer = new byte[_file.Size];
+        await _file.LocalFile.OpenRead().ReadAsync(buffer);
+        Content.Image = $"data:{_file.ContentType};base64,{Convert.ToBase64String(buffer)}";
+
+        // Wait 3 seconds before to reset the progress bar.
+        await Task.Delay(3000);
+        _progressPercent = 0;
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_editContext.Validate())
+        {
+            await Dialog?.CloseAsync(Content);
+        }
+    }
+
+    private async Task CancelAsync()
+    {
+        await Dialog?.CancelAsync();
+    }
+    
+    private async Task OpenImageSearchDialogAsync()
+    {
+        _openSearch = true;
+    }
+
+}

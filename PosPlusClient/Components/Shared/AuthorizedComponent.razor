@@ -17,7 +17,7 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && AppStateProvider.UserProfile is { Isadmin: false })
+        if (firstRender && AppStateProvider.UserProfile is { Isadmin: false } && AuthorizationState == UserAuthorizationState.Authoraizing)
         {
             DialogParameters parameters = new()
             {

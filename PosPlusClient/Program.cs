@@ -11,6 +11,9 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
+    // Add HttpClient to the DI container
+    builder.Services.AddHttpClient();
+    
     //Logging
     builder.Host.ConfigureSerilog();
 

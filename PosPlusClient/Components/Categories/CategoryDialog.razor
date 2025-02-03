@@ -1,0 +1,77 @@
+﻿@using PosPlusClient.Helpers
+@implements IDialogContentComponent<Category>
+
+<FluentDialogHeader ShowDismiss="true">
+    <FluentStack VerticalAlignment="VerticalAlignment.Center">
+        @if (Dialog.Instance.Parameters.PrimaryAction == "Crear")
+        {
+            <FluentIcon Value="@(new Regular.Size24.Add())"/>
+        }
+        else
+        {
+            <FluentIcon Value="@(new Regular.Size24.Edit())"/>
+        }
+        <FluentLabel Typo="Typography.PaneHeader">
+            @Dialog?.Instance.Parameters.Title
+        </FluentLabel>
+    </FluentStack>
+</FluentDialogHeader>
+
+<FluentDialogBody>
+    <FluentEditForm EditContext="@_editContext" FormName="create_category" novalidate>
+        <DataAnnotationsValidator/>
+        <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.Stretch">
+            <div style="width: 100%">
+                <FluentTextField Name="create_name"
+                                 @bind-Value="@Content.Name"
+                                 Label="Nombre"
+                                 Required
+                                 Style="width: 100%"
+                                 Autofocus="@true"
+                                 Appearance="FluentInputAppearance.Filled"/>
+                <FluentValidationMessage For="@(() => Content.Name)"/>
+            </div>
+        </FluentStack>
+    </FluentEditForm>
+</FluentDialogBody>
+<FluentDialogFooter>
+    <FluentButton Appearance="Appearance.Accent"
+                  Disabled="@(!_editContext.Validate())"
+                  OnClick="@SaveAsync">
+        @Dialog.Instance.Parameters.PrimaryAction
+    </FluentButton>
+    <FluentButton Appearance="Appearance.Neutral"
+                  OnClick="@CancelAsync">
+        @Dialog.Instance.Parameters.SecondaryAction
+    </FluentButton>
+</FluentDialogFooter>
+
+@code {
+    [Parameter] public Category Content { get; set; } = default!;
+
+    [CascadingParameter] public FluentDialog Dialog { get; set; } = default!;
+
+    private EditContext _editContext = default!;
+    private int _progressPercent;
+
+
+    protected override Task OnInitializedAsync()
+    {
+        _editContext = new EditContext(Content);
+        return base.OnInitializedAsync();
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_editContext.Validate())
+        {
+            await Dialog?.CloseAsync(Content);
+        }
+    }
+
+    private async Task CancelAsync()
+    {
+        await Dialog?.CancelAsync();
+    }
+
+}

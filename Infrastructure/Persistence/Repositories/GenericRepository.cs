@@ -20,7 +20,7 @@ public class GenericRepository<TEntity>(IDbContextFactory<ApplicationDbContext> 
         return await context.Set<TEntity>().FindAsync(id);
     }
 
-    public async Task<IEnumerable<TEntity>> GetAllAsync()
+    public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
     {
         var context = await contextFactory.CreateDbContextAsync();
         return await context.Set<TEntity>().ToListAsync();

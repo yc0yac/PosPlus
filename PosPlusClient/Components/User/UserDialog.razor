@@ -213,7 +213,6 @@
     private async Task OnCompletedAsync(IEnumerable<FluentInputFileEventArgs> files)
     {
         _file = files.ToArray().First();
-
         var buffer = new byte[_file.Size];
         await _file.LocalFile.OpenRead().ReadAsync(buffer);
         Content.Photo = $"data:{_file.ContentType};base64,{Convert.ToBase64String(buffer)}";

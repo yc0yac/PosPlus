@@ -13,11 +13,13 @@ public class RepositoryManager(IDbContextFactory<ApplicationDbContext> contextFa
 {
     private readonly Lazy<IUserRepository> _lazyUserRepository = new(()=>new UsersRepository(contextFactory));
     private readonly Lazy<ICategoriesRepository> _lazyCategoriesRepository = new(()=>new CategoriesRepository(contextFactory));
+    private readonly Lazy<IProductsRepository> _lazyProductsRepository = new(()=>new ProductsRepository(contextFactory));
 
     
     
     public IUserRepository User => _lazyUserRepository.Value; 
     public ICategoriesRepository Category => _lazyCategoriesRepository.Value; 
+    public IProductsRepository Product => _lazyProductsRepository.Value; 
 
     
 

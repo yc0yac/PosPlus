@@ -5,7 +5,7 @@ namespace Core.Contracts.Services;
 public interface ICategoriesService
 {
     Task<IEnumerable<Category>> GetAll();
-    Task<bool> Delete(Category user);
-    Task<bool> Create(Category user);
-    Task<bool> Edit(Category user);
+    Task<bool> Delete(Category category);
+    Task<bool> Create(Category category);
+    Task<bool> Edit(Category category);
 }
